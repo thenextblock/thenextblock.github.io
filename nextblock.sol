@@ -35,12 +35,12 @@ library SafeMath {
 
 contract TheNextBlock {
 
+    using SafeMath for uint256;
+    using SafeMath for uint8;
+
     event BetReceived(address sender, uint256 value, address betOnMiner, address miner, uint256 balance);
     event GivingBackTheRest(address sender, uint256 value, uint256 rest);
     event Jackpot(address winner);
-    event LogStr(string value);
-    event LogUint(uint256 value);
-    event LogAddress(address value);
     
     struct Owner {
         uint256 balance;
@@ -48,21 +48,20 @@ contract TheNextBlock {
     }
     
     
-    Owner owner;
-    bool public isBetEnabled = true;
+    Owner public owner;
     uint256 public allowedBetAmount = 10000000000000000; // 0.01 ETH
     uint8 public requiredPoints = 5;
     uint8 public ownerProfitPercent = 10;
     uint8 public prizePoolPercent = 90;
-    uint256 prizePool = 0;
+    uint256 public prizePool = 0;
     struct Player {
         uint256 balance;
         uint256[] wonBlocks;
         uint256 lastBlock;
     }
     
-    mapping(address => Player) private playersStorage;
-    mapping(address => uint8) private playersPoints;
+    mapping(address => Player) public playersStorage;
+    mapping(address => uint8) public playersPoints;
     
     modifier onlyOwner() {
         require(msg.sender == owner.addr);
@@ -76,7 +75,8 @@ contract TheNextBlock {
 
     modifier notMore() {
         if(msg.value > allowedBetAmount) {
-            GivingBackTheRest(msg.sender, msg.value, msg.value - allowedBetAmount);
+
+            GivingBackTheRest(msg.sender, msg.value,  SafeMath.sub(msg.value, allowedBetAmount));
             msg.sender.transfer( SafeMath.sub(msg.value, allowedBetAmount) );
         }
         _;
@@ -89,18 +89,12 @@ contract TheNextBlock {
         _;
     }
     
-    modifier onlyWhenBetIsEnabled() {
-        require(isBetEnabled);
-        _; 
-    }
-    
     function safeGetPercent(uint256 amount, uint8 percent) private pure returns(uint256) {
         return SafeMath.mul( SafeMath.div( SafeMath.sub(amount, amount%100), 100), percent);
     }
     
     function TheNextBlock() public {
         owner.addr = msg.sender;
-        LogStr("Congrats! Contract Created!");
     }
 
     function () public payable { }
@@ -108,27 +102,27 @@ contract TheNextBlock {
     function placeBet(address _miner) 
         public
         payable
-        onlyWhenBetIsEnabled
         notLess
         notMore
         onlyOnce {
             
             BetReceived(msg.sender, msg.value, _miner, block.coinbase,  this.balance);
 
-            owner.balance += safeGetPercent(allowedBetAmount, ownerProfitPercent);
-            prizePool += safeGetPercent(allowedBetAmount, prizePoolPercent);
+            owner.balance.add(safeGetPercent(allowedBetAmount, ownerProfitPercent));
+            prizePool.add(safeGetPercent(allowedBetAmount, prizePoolPercent));
 
             if(_miner == block.coinbase) {
                 playersPoints[msg.sender]++;
                 if(playersPoints[msg.sender] == requiredPoints) {
                     Jackpot(msg.sender);
                     playersStorage[msg.sender].wonBlocks.push(block.number);
+
                     if(prizePool >= allowedBetAmount) {
-                        playersStorage[msg.sender].balance += prizePool;
+                        playersStorage[msg.sender].balance.add(prizePool);
                         prizePool = 0;
                         playersPoints[msg.sender] = 0;
                     } else {
-                        playersPoints[msg.sender]--;
+                        playersPoints[msg.sender].sub(1); // Unlucky player, he had a chanse to won this prize pool, but we cant manage transaction ordering :( 
                     }
                 }
             } else {
@@ -184,12 +178,17 @@ contract TheNextBlock {
     function getBalance() public view returns(uint256) {
         return this.balance;
     }
-    
-    function toggleIsBetEnabled() public {
-        isBetEnabled = !isBetEnabled;
-    }
-    
+        
     function changeOwner(address newOwner) public onlyOwner {
         owner.addr = newOwner;
     }
+
+    function changeAllowedBetAmount(uint256 newAmount) public onlyOwner {
+        allowedBetAmount = newAmount;
+    }
+
+    function changeRequiredPoints(uint8 newRequiredPoints) public onlyOwner {
+        requiredPoints = newRequiredPoints;
+    }
+
 }
