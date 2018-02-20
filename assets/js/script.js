@@ -7,7 +7,7 @@ $(document).ready(function() {
             isInfoDialogVisible: true,
 			bets: [],
 			web31: null,
-			web31Addr: "ws://51.15.64.44:8546",
+			web31Addr: "wss://qubit.ge/ws",
             contract: {
                 addr: "0x6712F7e812499bfae13378eCfA7D27871AD406D2"
             },
