@@ -33,7 +33,8 @@ $(document).ready(function() {
             player: {
                 balance: 0,
                 points: 0,
-                pot: 0
+                pot: 0,
+				allowedBetAmount: 0
             }
         },
 		computed: {
@@ -124,17 +125,23 @@ $(document).ready(function() {
                     if (!err) _this.player.points = val.toString();
                 });
                 _this.contract.cls.allowedBetAmount(function(err, val) {
-                    if (!err) _this.player.allowedBetAmount = _this.formatFloat(_this.web31.utils.fromWei(val.toString(), 'ether'));
+                    if (!err) _this.player.allowedBetAmount = val.toString();
                 });
             },
             placeBet: function(miner) {
                 var _this = this;
+				console.log(miner);
                 _this.contract.cls.placeBet(miner, {
                     from: _this.metamask.web3.eth.accounts[0],
                     value: _this.player.allowedBetAmount,
                     gas: 4000000,
                     gasPrice: 35000000000
-                }, function(){});
+                }, function(err, result){
+					console.log(arguments);
+					if(err){
+						alertify.error("Bet Rejected!");
+					}
+				});
             },
             formatFloat: function(number, factor) {
                 //return parseFloat(Math.round(number * 100) / 100).toFixed(5);

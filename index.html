@@ -42,7 +42,7 @@
                         <span><b>My Points: {{player.points}}</b></span>
                     </div>
 					<div class="navbar-item">
-                        <span><b>Bet: {{player.allowedBetAmount}} ETH</b></span>
+                        <span><b>Bet: {{ formatFloat(web31.utils.fromWei(player.allowedBetAmount.toString(), 'ether'))}} ETH</b></span>
                     </div>
                 </div>
 
@@ -129,11 +129,11 @@
 								<tr v-for="(block, index) in blocks" v-bind:block-number="block.number">
 									<td>{{block.number}}</td>
 									<td>
-										<a target="_blank" v-bind:href="getEtherScanAddressLink(block.miner+'#mine')"><b>{{block.miner.toLowerCase()}}</b></a>
+										<a target="_blank" v-bind:href="getEtherScanAddressLink(block.miner+'#mine')"><b>{{block.miner}}</b></a>
 										<span v-tooltip.bottom="'This miner mined ' + formatFloat((getMinersBlockCount(block.miner) * 100)/blockCount, 2) + '% percent of '+ blockCount +' blocks'" class="tag is-light">
 											<b>{{getMinersBlockCount(block.miner)}} ({{formatFloat((getMinersBlockCount(block.miner) * 100)/blockCount, 2)}}%)</b>
 										</span>
-										<span v-if="minerNames[block.miner.toLowerCase()]" class="tag is-link"><b>{{minerNames[block.miner.toLowerCase()]}}</b></span>
+										<span v-if="minerNames[block.miner]" class="tag is-link"><b>{{minerNames[block.miner]}}</b></span>
 									</td>
 									<td><a v-on:click="placeBet(block.miner)" class="button is-success" v-tooltip.bottom="'Bet that this miner will mine your transaction.'">BET</a></td>
 								</tr>
