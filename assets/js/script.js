@@ -7,7 +7,7 @@ $(document).ready(function() {
             isInfoDialogVisible: true,
 			bets: [],
 			web31: null,
-			web31Addr: "wss://qubit.ge/ws",
+			web31Addr: "wss://node1.thenextblock.com/ws/",
             contract: {
                 addr: "0x6712F7e812499bfae13378eCfA7D27871AD406D2"
             },
@@ -36,6 +36,11 @@ $(document).ready(function() {
                 pot: 0
             }
         },
+		computed: {
+			isMainnet: function() {
+				return this.metamask.web3.version.network == "1";
+			}
+		},
         methods: {
             hasWeb3: function() {
                 return typeof web3 !== 'undefined' && web3.currentProvider;
@@ -110,16 +115,16 @@ $(document).ready(function() {
             loadContractData: function() {
                 var _this = this;
                 _this.contract.cls.getPot(function(err, val) {
-                    if (!err) _this.player.pot = _this.formatFloat(_this.metamask.web3.fromWei(val, 'ether'));
+                    if (!err) _this.player.pot = _this.formatFloat(_this.web31.utils.fromWei(val.toString(), 'ether'));
                 });
                 _this.contract.cls.getMyBalance(function(err, val) {
-                    if (!err) _this.player.balance = val.toString();
+                    if (!err) _this.player.balance = _this.formatFloat(_this.web31.utils.fromWei(val.toString(), 'ether'));
                 });
                 _this.contract.cls.getMyGuessCount(function(err, val) {
                     if (!err) _this.player.points = val.toString();
                 });
                 _this.contract.cls.allowedBetAmount(function(err, val) {
-                    if (!err) _this.player.allowedBetAmount = val.toString();
+                    if (!err) _this.player.allowedBetAmount = _this.formatFloat(_this.web31.utils.fromWei(val.toString(), 'ether'));
                 });
             },
             placeBet: function(miner) {

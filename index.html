@@ -18,12 +18,11 @@
 </head>
 
 <body style="display: none;">
-    <div style="min-width: 1530px;" id="app" v-show="isAppVisible">
+    <div id="app" v-show="isAppVisible">
         <nav class="navbar is-transparent is-fixed-top">
             <div class="navbar-brand">
                 <h1 class="navbar-item"><b>TheNextBlock</b></h1>
             </div>
-
             <div class="navbar-menu">
                 <div class="navbar-start">
                     <div class="navbar-item">
@@ -41,6 +40,9 @@
                     </div>
                     <div class="navbar-item">
                         <span><b>My Points: {{player.points}}</b></span>
+                    </div>
+					<div class="navbar-item">
+                        <span><b>Bet: {{player.allowedBetAmount}} ETH</b></span>
                     </div>
                 </div>
 
@@ -66,62 +68,80 @@
                 </div>
             </div>
         </nav>
+		
         <div class="container" style="margin-top: 70px;">
-            <div v-if="isInfoDialogVisible" class="tile is-ancestor">
-                <article class="message is-info">
-                    <div class="message-header">
-                        <p>Info</p>
-                        <button class="delete" aria-label="delete" v-on:click="isInfoDialogVisible = false"></button>
-                    </div>
-                    <div class="message-body">
-                        The Next Block
-                        <br> The Next Block is a blockchain-based game in which users must predict which miner will mines the transaction sent by players.
-                        <br>
-                        <strong> Game Rules: </strong>
-                        <br>
-                        <ul>
-                            <li> Each account (public address) is able place only one bet per block. </li>
-                            <li>If a player predicts the correct miner they will earn one point. </li>
-                            <li>If a player predicts (guesses) correctly in 5 consecutive bets and thus earns 5 points, hi is the winner and will receive 90% of the total pool (the bets collected). </li>
+			<div class="tile is-ancestor is-vertical">
+				<div v-if="!isMainnet" class="tile is-parent">
+					<div class="tile is-child is-12">
+						<article class="message is-danger">
+							<div class="message-header">
+								<p>Warning</p>
+							</div>
+							<div class="message-body">
+								You are in the testnet. 
+								Please Change Metamask network to main.
+							</div>
+						</article>
+					</div>
+				</div>
+				<div v-show="isInfoDialogVisible" class="tile is-parent">
+					<div class="tile is-child is-12">
+						<article class="message is-info">
+							<div class="message-header">
+								<p>Info</p>
+								<button class="delete" aria-label="delete" v-on:click="isInfoDialogVisible = false"></button>
+							</div>
+							<div class="message-body">
+								The Next Block
+								<br> The Next Block is a blockchain-based game in which users must predict which miner will mines the transaction sent by players.
+								<br>
+								<strong> Game Rules: </strong>
+								<br>
+								<ul>
+									<li> Each account (public address) is able place only one bet per block. </li>
+									<li>If a player predicts the correct miner they will earn one point. </li>
+									<li>If a player predicts (guesses) correctly in 5 consecutive bets and thus earns 5 points, hi is the winner and will receive 90% of the total pool (the bets collected). </li>
 
-                            <li>If the player does not correctly predict the miner, his/her points will be reduced to zero. </li>
-                        </ul>
-                        <strong>The total prize are collected from players' bets until one player correctly predicts 5 miners in a row. It is not necessary bet on  each block; it is up to you where to place your bets. </strong>
-                    </div>
-                </article>
-            </div>
-            <div class="tile is-ancestor">
-                <div class="tile is-12">
-                    <table class="table is-hoverable is-fullwidth center-table">
-                        <thead>
-                            <tr>
-                                <th>Block #</th>
-                                <th>Miner</th>
-                                <th>
-                                    <div class="select" v-tooltip.left="'Number of Blocks'">
-                                        <select style="width: 80px; margin: 0 auto;" v-model="blockCount" v-on:change="loadBlocks()">
-                                          <option v-for="bo in blockCountOptions">{{bo}}</option>
-                                        </select>
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(block, index) in blocks" v-bind:block-number="block.number">
-                                <td>{{block.number}}</td>
-                                <td>
-                                    <a target="_blank" v-bind:href="getEtherScanAddressLink(block.miner+'#mine')"><b>{{block.miner.toLowerCase()}}</b></a>
-                                    <span v-tooltip.bottom="'This miner mined ' + formatFloat((getMinersBlockCount(block.miner) * 100)/blockCount, 2) + '% percent of '+ blockCount +' blocks'" class="tag is-light">
-										<b>{{getMinersBlockCount(block.miner)}} ({{formatFloat((getMinersBlockCount(block.miner) * 100)/blockCount, 2)}}%)</b>
-									</span>
-                                    <span v-if="minerNames[block.miner.toLowerCase()]" class="tag is-link"><b>{{minerNames[block.miner.toLowerCase()]}}</b></span>
-                                </td>
-                                <td><a v-on:click="placeBet(block.miner)" class="button is-success" v-tooltip.bottom="'Bet that this miner will mine your transaction.'">BET</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+									<li>If the player does not correctly predict the miner, his/her points will be reduced to zero. </li>
+								</ul>
+								<strong>The total prize are collected from players' bets until one player correctly predicts 5 miners in a row. It is not necessary bet on  each block; it is up to you where to place your bets. </strong>
+							</div>
+						</article>
+					</div>
+				</div>
+				<div class="tile is-parent">
+					<div class="tile is-12">
+						<table class="table is-hoverable is-fullwidth center-table">
+							<thead>
+								<tr>
+									<th>Block #</th>
+									<th>Miner</th>
+									<th>
+										<div class="select" v-tooltip.left="'Number of Blocks'">
+											<select style="width: 80px; margin: 0 auto;" v-model="blockCount" v-on:change="loadBlocks()">
+											  <option v-for="bo in blockCountOptions">{{bo}}</option>
+											</select>
+										</div>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr v-for="(block, index) in blocks" v-bind:block-number="block.number">
+									<td>{{block.number}}</td>
+									<td>
+										<a target="_blank" v-bind:href="getEtherScanAddressLink(block.miner+'#mine')"><b>{{block.miner.toLowerCase()}}</b></a>
+										<span v-tooltip.bottom="'This miner mined ' + formatFloat((getMinersBlockCount(block.miner) * 100)/blockCount, 2) + '% percent of '+ blockCount +' blocks'" class="tag is-light">
+											<b>{{getMinersBlockCount(block.miner)}} ({{formatFloat((getMinersBlockCount(block.miner) * 100)/blockCount, 2)}}%)</b>
+										</span>
+										<span v-if="minerNames[block.miner.toLowerCase()]" class="tag is-link"><b>{{minerNames[block.miner.toLowerCase()]}}</b></span>
+									</td>
+									<td><a v-on:click="placeBet(block.miner)" class="button is-success" v-tooltip.bottom="'Bet that this miner will mine your transaction.'">BET</a></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
         </div>
     </div>
     <script type="text/javascript" src="assets/js/web31.js"></script>
