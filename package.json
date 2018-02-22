@@ -1,0 +1,29 @@
+{
+  "name": "thenextblock.github.io",
+  "version": "1.0.0",
+  "description": "TheNextBlock Ethereum Smartcontract DAPP ",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thenextblock/thenextblock.github.io.git"
+  },
+  "keywords": [
+    "Ethereum",
+    "Smartcontract",
+    "Solidity",
+    "Blockchain",
+    "Miner"
+  ],
+  "author": "@svireli @achiko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thenextblock/thenextblock.github.io/issues"
+  },
+  "homepage": "https://github.com/thenextblock/thenextblock.github.io#readme"
+}
