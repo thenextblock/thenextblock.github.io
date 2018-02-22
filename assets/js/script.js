@@ -119,7 +119,7 @@ $(document).ready(function() {
             },
             loadContractData: function() {
                 var _this = this;
-                _this.contract.cls.getPot(function(err, val) {
+                _this.contract.cls.getPrizePool(function(err, val) {
                     if (!err) _this.player.pot = _this.formatFloat(_this.web31.utils.fromWei(val.toString(), 'ether'));
                 });
                 _this.contract.cls.getMyBalance(function(err, val) {
