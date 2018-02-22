@@ -46,10 +46,9 @@
                     </div>
                 </div>
 
-                <div class="navbar-end" id="account" v-if="metamask.address.length">
-
+                <div class="navbar-end" id="account">
                     <div class="navbar-item">
-						<button style="margin-left: 5px;" class="bd-tw-button button is-success" v-on:click="withdrawBalance">
+						<button :disabled="isButtonDisabled" style="margin-left: 5px;" class="bd-tw-button button is-success" v-on:click="withdrawBalance">
 							<span class="icon">
 							  <i class="fas fa-arrow-alt-circle-up"></i>
 							</span>
@@ -109,7 +108,7 @@
 						</article>
 					</div>
 				</div>
-				<div class="tile is-parent">
+				<div class="tile is-parent is-vertical">
 					<div class="tile is-12">
 						<table class="table is-hoverable is-fullwidth center-table">
 							<thead>
@@ -135,7 +134,25 @@
 										</span>
 										<span v-if="minerNames[block.miner]" class="tag is-link"><b>{{minerNames[block.miner]}}</b></span>
 									</td>
-									<td><a v-on:click="placeBet(block.miner)" class="button is-success" v-tooltip.bottom="'Bet that this miner will mine your transaction.'">BET</a></td>
+									<td><button :disabled="isButtonDisabled" v-on:click="placeBet(block.miner)" class="button is-success" v-tooltip.bottom="'Bet that this miner will mine your transaction.'">BET</button></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="tile is-12">
+						<table class="table is-hoverable is-fullwidth center-table">
+							<thead>
+								<tr>
+									<th>Bet By</th>
+									<th>On Miner</th>
+									<th>Mined By</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr v-bind:class="{ 'is-selected': (bet.returnValues.betOnMiner == bet.returnValues.miner) }" v-for="(bet, index) in bets">
+									<td><span v-if="compareAddr(bet.returnValues.sender, metamask.address)">(You)</span> {{bet.returnValues.sender}}</td>
+									<td>{{bet.returnValues.betOnMiner}}</td>
+									<td>{{bet.returnValues.miner}}</td>
 								</tr>
 							</tbody>
 						</table>

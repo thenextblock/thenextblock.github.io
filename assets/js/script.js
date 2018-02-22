@@ -5,16 +5,17 @@ $(document).ready(function() {
         data: {
 			isAppVisible: false,
             isInfoDialogVisible: true,
+			isTest: true,
 			bets: [],
 			web31: null,
 			web31Addr: "wss://node1.thenextblock.com/ws/",
+			web31Contract: null,
             contract: {
                 addr: "0x6712F7e812499bfae13378eCfA7D27871AD406D2"
             },
             metamask: {
                 address: "",
-                balance: 0,
-                lastBlockNumber: 0
+                balance: 0
             },
             blocks: [],
             minerNames: {
@@ -39,19 +40,22 @@ $(document).ready(function() {
         },
 		computed: {
 			isMainnet: function() {
-				return this.metamask.web3.version.network == "1";
-			}
-		},
-        methods: {
-            hasWeb3: function() {
+				return this.metamask.web3 && this.metamask.web3.version.network == "1";
+			},
+			hasWeb3: function() {
                 return typeof web3 !== 'undefined' && web3.currentProvider;
             },
             hasMetamask: function() {
                 return web3.currentProvider.isMetaMask && web3.currentProvider.isConnected();
             },
             isMetaMaskLocked: function() {
-                return !this.metamask.web3.eth.accounts.length;
+                return this.metamask.web3 && !this.metamask.web3.eth.accounts.length;
             },
+			isButtonDisabled: function() {
+				return !this.hasWeb3 || !this.hasMetamask || this.isMetaMaskLocked;
+			}
+		},
+        methods: {
 			sortBlocks: function() {
                 var _this = this;
                 _this.blocks = _this.blocks.sort(function(a, b) {
@@ -158,8 +162,10 @@ $(document).ready(function() {
             },
             onNewBlockMined: function(err, result) {
                 var _this = this;
-                _this.loadAccount();
-                _this.loadContractData();
+				if(!_this.isButtonDisabled){
+					_this.loadAccount();
+					_this.loadContractData();
+				}
                 if (err) {
                     alertify.error("Error: Can't receive block event");
                 } else {
@@ -173,6 +179,12 @@ $(document).ready(function() {
             onBetReceived: function(err, result) {
                 var _this = this;
 				console.log("bet received", arguments);
+				_this.bets.unshift(result);
+            },
+			onJackpot: function(err, result) {
+                var _this = this;
+				console.log("jackpot ", arguments);
+				alertify.success("Someone won jackpot");
             },
 			withdrawBalance: function() {
 				var _this = this;
@@ -180,30 +192,15 @@ $(document).ready(function() {
 					alertify.error("Your balance is empty!");
 					return;
 				}
+			},
+			compareAddr: function(addr1, addr2) {
+				return addr1.toLowerCase() == addr2.toLowerCase();
 			}
         },
         created: function() {
             var _this = this;
 			$("body").show();
-            if (!_this.hasWeb3()) {
-                alertify.alert('Error', 'Metamask Extension is not installed. </br> Install Metamask <a target="_blank" href="https://metamask.io/">here</a> and refresh website.', function() {
-                    alertify.error('Install Metamask Extension.');
-                });
-                return;
-            }
-            if (!_this.hasMetamask()) {
-                alertify.alert('Error', "Your metamask is not connected.", function() {});
-                return;
-            }
-			_this.metamask.web3 = new Web3(web3.currentProvider);
-			_this.web31 = new Web31( new Web31.providers.WebsocketProvider(_this.web31Addr));
-            if (_this.isMetaMaskLocked()) {
-                alertify.alert('Error', "Metamask is locked.", function() {
-                    alertify.error('Unlock Metamask.');
-                });
-                return;
-            }
-            _this.contract.abi = [{
+			_this.contract.abi = [{
                     "constant": true,
                     "inputs": [],
                     "name": "getBalance",
@@ -514,16 +511,34 @@ $(document).ready(function() {
                     "type": "event"
                 }
             ];
-
-            _this.contract.cls = _this.metamask.web3.eth.contract(_this.contract.abi).at(_this.contract.addr);
+			_this.web31 = new Web31(new Web31.providers.WebsocketProvider(_this.web31Addr));
+			if (_this.hasWeb3) {
+				_this.metamask.web3 = new Web3(web3.currentProvider);
+				if (!_this.hasMetamask) {
+					alertify.alert('Error', 'Metamask is not connected.', function() {
+						alertify.error('Check Metamask and refresh website!');
+					});
+				} else if (_this.isMetaMaskLocked) {
+					alertify.alert('Error', "Metamask is locked.", function() {
+						alertify.error('Unlock Metamask and refresh website.');
+					});
+				} else {
+					_this.contract.cls = _this.metamask.web3.eth.contract(_this.contract.abi).at(_this.contract.addr);
+					_this.loadAccount();
+					_this.loadContractData();
+				}
+            } else {
+				alertify.alert('Error', 'Metamask Extension is not installed. </br> Download Metamask <a target="_blank" href="https://metamask.io/">here</a>.', function() {
+                    alertify.error('Install Metamask Extension.');
+                });
+			}
             _this.loadBlockCountOptions(10, 5);
-            _this.loadAccount();
             _this.loadBlocks();
-            _this.loadContractData();
             _this.web31.eth.subscribe('newBlockHeaders', _this.onNewBlockMined);
+			_this.web31Contract = new _this.web31.eth.Contract(_this.contract.abi, '0x6712F7e812499bfae13378eCfA7D27871AD406D2');
+			_this.web31Contract.events.BetReceived({}, _this.onBetReceived);
+			_this.web31Contract.events.Jackpot({}, _this.onJackpot);
 			_this.isAppVisible = true;
-            /*_this.filters.betReceived = _this.contract.cls.BetReceived();
-            _this.filters.betReceived.watch(_this.onBetReceived);*/
         }
     });
 });
