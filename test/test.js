@@ -6,6 +6,7 @@ contract('TheNextBlock', function (accounts) {
 
     let GiftoContract; 
     let coinContractInstance;
+    
     const owner = accounts[0];
     const player_1 = accounts[1];
     const player_2 = accounts[2];
@@ -16,7 +17,7 @@ contract('TheNextBlock', function (accounts) {
     });
 
     it('Just Fake Test', async function () {
-        asert.equal(1,1);
+        assert.equal(1,1);
     });
 
 });
