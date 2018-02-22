@@ -199,346 +199,40 @@ $(document).ready(function() {
         },
         created: function() {
             var _this = this;
-			$("body").show();
-			_this.contract.abi = [{
-                    "constant": true,
-                    "inputs": [],
-                    "name": "getBalance",
-                    "outputs": [{
-                        "name": "",
-                        "type": "uint256"
-                    }],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function"
-                },
-                {
-                    "constant": false,
-                    "inputs": [{
-                        "name": "_miner",
-                        "type": "address"
-                    }],
-                    "name": "placeBet",
-                    "outputs": [],
-                    "payable": true,
-                    "stateMutability": "payable",
-                    "type": "function"
-                },
-                {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "isBetEnabled",
-                    "outputs": [{
-                        "name": "",
-                        "type": "bool"
-                    }],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function"
-                },
-                {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "getPot",
-                    "outputs": [{
-                        "name": "",
-                        "type": "uint256"
-                    }],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function"
-                },
-                {
-                    "constant": false,
-                    "inputs": [],
-                    "name": "withdrawMyFunds",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function"
-                },
-                {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "getMyBalance",
-                    "outputs": [{
-                        "name": "",
-                        "type": "uint256"
-                    }],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function"
-                },
-                {
-                    "constant": false,
-                    "inputs": [],
-                    "name": "withdrawOwnersFunds",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function"
-                },
-                {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "allowedBetAmount",
-                    "outputs": [{
-                        "name": "",
-                        "type": "uint256"
-                    }],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function"
-                },
-                {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "getMyGuessCount",
-                    "outputs": [{
-                        "name": "",
-                        "type": "uint8"
-                    }],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function"
-                },
-                {
-                    "constant": true,
-                    "inputs": [{
-                        "name": "playerAddr",
-                        "type": "address"
-                    }],
-                    "name": "getPlayersGuessCount",
-                    "outputs": [{
-                        "name": "",
-                        "type": "uint8"
-                    }],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function"
-                },
-                {
-                    "constant": true,
-                    "inputs": [{
-                        "name": "playerAddr",
-                        "type": "address"
-                    }],
-                    "name": "getPlayersWonBlocks",
-                    "outputs": [{
-                        "name": "",
-                        "type": "uint256[]"
-                    }],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function"
-                },
-                {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "requiredGuessCount",
-                    "outputs": [{
-                        "name": "",
-                        "type": "uint8"
-                    }],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function"
-                },
-                {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "jackpotPercent",
-                    "outputs": [{
-                        "name": "",
-                        "type": "uint8"
-                    }],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function"
-                },
-                {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "ownerProfitPercent",
-                    "outputs": [{
-                        "name": "",
-                        "type": "uint8"
-                    }],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function"
-                },
-                {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "getMyWonBlocks",
-                    "outputs": [{
-                        "name": "",
-                        "type": "uint256[]"
-                    }],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function"
-                },
-                {
-                    "constant": true,
-                    "inputs": [{
-                        "name": "playerAddr",
-                        "type": "address"
-                    }],
-                    "name": "getPlayersBalance",
-                    "outputs": [{
-                        "name": "",
-                        "type": "uint256"
-                    }],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function"
-                },
-                {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "getOwnersBalance",
-                    "outputs": [{
-                        "name": "",
-                        "type": "uint256"
-                    }],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function"
-                },
-                {
-                    "inputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "constructor"
-                },
-                {
-                    "payable": true,
-                    "stateMutability": "payable",
-                    "type": "fallback"
-                },
-                {
-                    "anonymous": false,
-                    "inputs": [{
-                            "indexed": false,
-                            "name": "sender",
-                            "type": "address"
-                        },
-                        {
-                            "indexed": false,
-                            "name": "value",
-                            "type": "uint256"
-                        },
-                        {
-                            "indexed": false,
-                            "name": "betOnMiner",
-                            "type": "address"
-                        },
-                        {
-                            "indexed": false,
-                            "name": "miner",
-                            "type": "address"
-                        },
-                        {
-                            "indexed": false,
-                            "name": "balance",
-                            "type": "uint256"
-                        }
-                    ],
-                    "name": "BetReceived",
-                    "type": "event"
-                },
-                {
-                    "anonymous": false,
-                    "inputs": [{
-                            "indexed": false,
-                            "name": "sender",
-                            "type": "address"
-                        },
-                        {
-                            "indexed": false,
-                            "name": "value",
-                            "type": "uint256"
-                        },
-                        {
-                            "indexed": false,
-                            "name": "rest",
-                            "type": "uint256"
-                        }
-                    ],
-                    "name": "GivingBackTheRest",
-                    "type": "event"
-                },
-                {
-                    "anonymous": false,
-                    "inputs": [{
-                        "indexed": false,
-                        "name": "winner",
-                        "type": "address"
-                    }],
-                    "name": "Jackpot",
-                    "type": "event"
-                },
-                {
-                    "anonymous": false,
-                    "inputs": [{
-                        "indexed": false,
-                        "name": "value",
-                        "type": "string"
-                    }],
-                    "name": "LogStr",
-                    "type": "event"
-                },
-                {
-                    "anonymous": false,
-                    "inputs": [{
-                        "indexed": false,
-                        "name": "value",
-                        "type": "uint256"
-                    }],
-                    "name": "LogUint",
-                    "type": "event"
-                },
-                {
-                    "anonymous": false,
-                    "inputs": [{
-                        "indexed": false,
-                        "name": "value",
-                        "type": "address"
-                    }],
-                    "name": "LogAddress",
-                    "type": "event"
+            $.getJSON('/build/contracts/TheNextBlock.json', function(data) {
+                _this.web31 = new Web31(new Web31.providers.WebsocketProvider(_this.web31Addr));
+                _this.contract.abi = data.abi;
+                if (_this.hasWeb3) {
+                    _this.metamask.web3 = new Web3(web3.currentProvider);
+                    if (!_this.hasMetamask) {
+                        alertify.alert('Error', 'Metamask is not connected.', function() {
+                            alertify.error('Check Metamask and refresh website!');
+                        });
+                    } else if (_this.isMetaMaskLocked) {
+                        alertify.alert('Error', "Metamask is locked.", function() {
+                            alertify.error('Unlock Metamask and refresh website.');
+                        });
+                    } else {
+                        _this.contract.cls = _this.metamask.web3.eth.contract(_this.contract.abi).at(_this.contract.addr);
+                        _this.loadAccount();
+                        _this.loadContractData();
+                    }
+                } else {
+                    alertify.alert('Error', 'Metamask Extension is not installed. </br> Download Metamask <a target="_blank" href="https://metamask.io/">here</a>.', function() {
+                        alertify.error('Install Metamask Extension.');
+                    });
                 }
-            ];
-			_this.web31 = new Web31(new Web31.providers.WebsocketProvider(_this.web31Addr));
-			if (_this.hasWeb3) {
-				_this.metamask.web3 = new Web3(web3.currentProvider);
-				if (!_this.hasMetamask) {
-					alertify.alert('Error', 'Metamask is not connected.', function() {
-						alertify.error('Check Metamask and refresh website!');
-					});
-				} else if (_this.isMetaMaskLocked) {
-					alertify.alert('Error', "Metamask is locked.", function() {
-						alertify.error('Unlock Metamask and refresh website.');
-					});
-				} else {
-					_this.contract.cls = _this.metamask.web3.eth.contract(_this.contract.abi).at(_this.contract.addr);
-					_this.loadAccount();
-					_this.loadContractData();
-				}
-            } else {
-				alertify.alert('Error', 'Metamask Extension is not installed. </br> Download Metamask <a target="_blank" href="https://metamask.io/">here</a>.', function() {
-                    alertify.error('Install Metamask Extension.');
-                });
-			}
-            _this.loadBlockCountOptions(10, 5);
-            _this.loadBlocks();
-            _this.web31.eth.subscribe('newBlockHeaders', _this.onNewBlockMined);
-			_this.web31Contract = new _this.web31.eth.Contract(_this.contract.abi, '0x6712F7e812499bfae13378eCfA7D27871AD406D2');
-			_this.web31Contract.events.BetReceived({}, _this.onBetReceived);
-			_this.web31Contract.events.Jackpot({}, _this.onJackpot);
-			_this.isAppVisible = true;
+                _this.loadBlockCountOptions(10, 5);
+                _this.loadBlocks();
+                _this.web31.eth.subscribe('newBlockHeaders', _this.onNewBlockMined);
+                _this.web31Contract = new _this.web31.eth.Contract(_this.contract.abi, _this.contract.addr);
+                _this.web31Contract.events.BetReceived({}, _this.onBetReceived);
+                _this.web31Contract.events.Jackpot({}, _this.onJackpot);    
+                _this.isAppVisible = true;
+                $("body").show();
+            }).fail(function(){
+                alertify.error("Can't load contract abi.");
+            });
         }
     });
 });
