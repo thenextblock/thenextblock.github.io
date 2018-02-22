@@ -51,12 +51,11 @@ contract TheNextBlock {
     Owner public owner;
     uint256 public allowedBetAmount = 10000000000000000; // 0.01 ETH
     uint8 public requiredPoints = 5;
-    uint8 public ownerProfitPercent = 10;
-    uint8 public prizePoolPercent = 90;
+    uint8 public ownerProfitPercent = 10; // Contract owner  
+    uint8 public prizePoolPercent = 70; // We reserve 20 % for next prizepool 
     uint256 public prizePool = 0;
     struct Player {
         uint256 balance;
-        uint256[] wonBlocks;
         uint256 lastBlock;
     }
     
@@ -108,23 +107,21 @@ contract TheNextBlock {
             
             BetReceived(msg.sender, msg.value, _miner, block.coinbase,  this.balance);
 
-            owner.balance.add(safeGetPercent(allowedBetAmount, ownerProfitPercent));
-            prizePool.add(safeGetPercent(allowedBetAmount, prizePoolPercent));
+            owner.balance = owner.balance.add(safeGetPercent(allowedBetAmount, ownerProfitPercent));
+            prizePool = prizePool.add(safeGetPercent(allowedBetAmount, prizePoolPercent));
 
             if(_miner == block.coinbase) {
                 
-                playersPoints[msg.sender].add(1);
+                playersPoints[msg.sender] = playersPoints[msg.sender].add(1);
 
                 if(playersPoints[msg.sender] == requiredPoints) {
                     Jackpot(msg.sender);
-                    playersStorage[msg.sender].wonBlocks.push(block.number);
-
                     if(prizePool >= allowedBetAmount) {
-                        playersStorage[msg.sender].balance.add(prizePool);
-                        prizePool = 0;
+                        playersStorage[msg.sender].balance = playersStorage[msg.sender].balance.add(prizePool);
+                        prizePool = prizePool.sub( safeGetPercent(allowedBetAmount, prizePoolPercent) );
                         playersPoints[msg.sender] = 0;
                     } else {
-                        playersPoints[msg.sender].sub(1); // Unlucky player, he had a chanse to won this prize pool, but we cant manage transaction ordering :( 
+                        playersPoints[msg.sender] = playersPoints[msg.sender].sub(1); // Unlucky player, he had a chanse to won this prize pool, but we cant manage transaction ordering :( 
                     }
                 }
             } else {
@@ -138,10 +135,6 @@ contract TheNextBlock {
     
     function getPlayersGuessCount(address playerAddr) public view returns(uint8) {
         return playersPoints[playerAddr];
-    }
-    
-    function getPlayersWonBlocks(address playerAddr) public view returns(uint256[]) {
-        return playersStorage[playerAddr].wonBlocks;
     }
     
     function getMyBalance() public view returns(uint256) {

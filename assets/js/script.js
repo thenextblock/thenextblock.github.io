@@ -199,8 +199,10 @@ $(document).ready(function() {
         },
         created: function() {
             var _this = this;
+            _this.web31 = new Web31(new Web31.providers.WebsocketProvider(_this.web31Addr));
+
             $.getJSON('/build/contracts/TheNextBlock.json', function(data) {
-                _this.web31 = new Web31(new Web31.providers.WebsocketProvider(_this.web31Addr));
+                
                 _this.contract.abi = data.abi;
                 if (_this.hasWeb3) {
                     _this.metamask.web3 = new Web3(web3.currentProvider);
