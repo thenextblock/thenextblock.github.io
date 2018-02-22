@@ -1,0 +1,8 @@
+# OS X
+*.DS_Store
+
+# Intellij IDEA
+*.iml
+
+# Node.Js
+node_modules
