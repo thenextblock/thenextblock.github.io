@@ -112,7 +112,9 @@ contract TheNextBlock {
             prizePool.add(safeGetPercent(allowedBetAmount, prizePoolPercent));
 
             if(_miner == block.coinbase) {
-                playersPoints[msg.sender]++;
+                
+                playersPoints[msg.sender].add(1);
+
                 if(playersPoints[msg.sender] == requiredPoints) {
                     Jackpot(msg.sender);
                     playersStorage[msg.sender].wonBlocks.push(block.number);
