@@ -136,6 +136,9 @@ var state = {
             _this.contract.cls.allowedBetAmount(function(err, val) {
                 if (!err) _this.player.allowedBetAmount = val.toString();
             });
+            _this.contract.cls.totalBetCount(function(err, val) {
+                if (!err) _this.player.totalBetCount = val.toString();
+            });
         },
         placeBet: function(miner) {
             var _this = this;
