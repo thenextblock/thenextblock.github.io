@@ -11,6 +11,7 @@ contract('TheNextBlock', function (accounts) {
     const player_1 = accounts[1];
     const player_2 = accounts[2];
     const player_3 = accounts[3];
+    const vandal = accounts[4];
 
     const alloweBetAmount = web3.toWei(0.01, 'ether');
 
@@ -44,31 +45,46 @@ contract('TheNextBlock', function (accounts) {
         await GameContract.placeBet(correctMinerAddress, { from: player_1, value: alloweBetAmount  });        
         assert.equal((await GameContract.getPlayersPoints(player_1)).toNumber(),  4 );    
 
-        assert.equal(( (await GameContract.getPrizePool()).toNumber() + (await GameContract.getOwnersBalance()).toNumber()), web3.toWei(0.05, 'ether'));
+        let prizePool =  (await GameContract.getPrizePool()).toNumber();
+        let nextPrizePool =  (await GameContract.getNextPrizePool()).toNumber() ;
+        let ownerBalance =  (await GameContract.getOwnersBalance()).toNumber() ;
 
-        let prizePool = await GameContract.getPrizePool();
-        let _prizePool = new BigNumber( await GameContract.getPrizePool() ).plus( alloweBetAmount * 0.9 );
+        assert.equal( (prizePool + nextPrizePool + ownerBalance), web3.toWei(0.05, 'ether') );
 
-        console.log( 'prizePool' ,   prizePool.toNumber(),  web3.fromWei(prizePool.toNumber(), 'ether')   );
-        console.log( ' _prizePool', _prizePool.toNumber(),  web3.fromWei(_prizePool.toNumber(), 'ether')  );
-        
+        let _prizePool = new BigNumber(prizePool).plus( alloweBetAmount * 0.7 );
+        let _nextPrizePool = new BigNumber(nextPrizePool).plus( alloweBetAmount * 0.2 );
+
         await GameContract.placeBet(correctMinerAddress, { from: player_1, value: web3.toWei(0.01, 'ether')  });
+        let winningBalance = ((await GameContract.getPlayerData( player_1 ))[1]).toNumber();
+        assert.equal(winningBalance, _prizePool);
 
-        var winningBalance = ((await GameContract.getPlayerData( player_1 ))[1]).toNumber();
+        nextPrizePool =  (await GameContract.getNextPrizePool()).toNumber();
+        prizePool =  (await GameContract.getPrizePool()).toNumber();
+        assert.equal(nextPrizePool, 0);
+        assert.equal(prizePool, _nextPrizePool);
 
-        console.log( 'Winner Player balance : ', winningBalance );
+        //await GameContract.withdrawMyFunds({ from : vandal }).should.be.rejectedWith(EVMThrow); 
+        
+        let player_1_previous_balance = new BigNumber(await web3.eth.getBalance(player_1));
+        await GameContract.withdrawMyFunds({ from: player_1 });
+        let player_1_current_balance = new BigNumber(await web3.eth.getBalance(player_1));
+        player_1_previous_balance.should.be.bignumber.lessThan(player_1_current_balance);
 
-        //assert.equal( ((await GameContract.getPlayerData( player_1 ))[1]).toNumber() ,  (_prizePool * 0.8) ); 
+        //console.log( web3.fromWei(player_1_previous_balance.toNumber(), 'ether') , web3.fromWei(player_1_current_balance.toNumber(), 'ether') , web3.fromWei(winningBalance, 'ether')  );
 
-        //prizePool  +=  typeof(web3.toWei(0.01, 'ether')  ); 
+        assert.equal( ((await GameContract.getPlayerData( player_1 ))[1]).toNumber() , 0);
 
-        //console.log( 'prizePool' ,  prizePool);
+        await GameContract.withdrawOwnersFunds({ from : vandal }).should.be.rejectedWith(EVMThrow); ;
 
-        //console.log('Prize Pool',  (await GameContract.getPrizePool()).toNumber() ); 
-        //onsole.log('owner balance ',  (await GameContract.getOwnersBalance()).toNumber() ); 
+        let owner_previous_balance = new BigNumber(await web3.eth.getBalance(owner));
+        await GameContract.withdrawOwnersFunds({ from : owner });
+        let owner_current_balance = new BigNumber(await web3.eth.getBalance(owner));
+        owner_previous_balance.should.be.bignumber.lessThan(owner_current_balance);
+        assert.equal( ((await GameContract.getOwnersBalance())).toNumber() , 0);
 
-        // console.log('Player balance : ',  ( (await GameContract.getPlayerData( player_1 ) )[1] ).toNumber()  );
- 
+
+
+
     });
 
 

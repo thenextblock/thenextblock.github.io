@@ -67,8 +67,10 @@ contract TheNextBlock {
     * we preserve 20% for next prize pool
     */
     uint256 public ownerProfitPercent = 10;
+    uint256 public nextPrizePoolPercent = 20;
     uint256 public prizePoolPercent = 70; 
     uint256 public prizePool = 0;
+    uint256 public nextPrizePool = 0;
     uint256 public totalBetCount = 0;
     
     struct Player {
@@ -126,32 +128,32 @@ contract TheNextBlock {
         notLess
         notMore
         onlyOnce {
+            
             totalBetCount = totalBetCount.add(1);
             BetReceived(msg.sender, _miner, block.coinbase);
-            owner.balance = owner.balance.add(safeGetPercent(allowedBetAmount, ownerProfitPercent));
-            //Owner takes his percent and prizepool everyhing else
-            prizePool = prizePool.add(safeGetPercent(allowedBetAmount, SafeMath.sub(100, ownerProfitPercent)));
+
+            owner.balance = owner.balance.add( safeGetPercent(allowedBetAmount, ownerProfitPercent) );
+            prizePool = prizePool.add( safeGetPercent(allowedBetAmount, prizePoolPercent) );
+            nextPrizePool = nextPrizePool.add( safeGetPercent(allowedBetAmount, nextPrizePoolPercent) );
+
             if(_miner == block.coinbase) {
+                
                 playersPoints[msg.sender] = playersPoints[msg.sender].add(1);
+
                 if(playersPoints[msg.sender] == requiredPoints) {
-                    /**
-                    * Here comes complicated part.
-                    * If player won jackpot but there is no ether
-                    * on the balance we give him a chance and decrease
-                    * points by one instead of setting it to 0.
-                    * There must be more ether than allowedBetAmount.
-                    */
+                    
                     if(prizePool >= allowedBetAmount) {
-                        uint256 amount = safeGetPercent(prizePool, prizePoolPercent);
-                        Jackpot(msg.sender, amount);
-                        playersStorage[msg.sender].balance = playersStorage[msg.sender].balance.add(amount);
-                        prizePool = prizePool.sub(amount);
+                        Jackpot(msg.sender, prizePool);
+                        playersStorage[msg.sender].balance = playersStorage[msg.sender].balance.add(prizePool);
+                        prizePool = nextPrizePool;
+                        nextPrizePool = 0;
                         playersPoints[msg.sender] = 0;
                     } else {
                         Jackpot(msg.sender, 0);
                         playersPoints[msg.sender]--;
                     }
                 }
+
             } else {
                 playersPoints[msg.sender] = 0;
             }
@@ -199,6 +201,11 @@ contract TheNextBlock {
     function getPrizePool() public view returns(uint256) {
         return prizePool;
     }
+
+    function getNextPrizePool() public view returns(uint256) {
+        return nextPrizePool;
+    }
+    
     
     function getBalance() public view returns(uint256) {
         return this.balance;
