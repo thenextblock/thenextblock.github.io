@@ -25,7 +25,7 @@ var state = {
             balance: 0
         },
         blocks: [],
-        minerNames: {},
+        minerNames: null,
         blockCount: 0,
         blockCountOptions: [],
         player: {
