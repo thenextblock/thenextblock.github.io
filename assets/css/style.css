@@ -137,3 +137,11 @@
 	opacity: 1;
 	transition: opacity .15s;
 }
+
+.isWin {
+	background-color: #55efc4;
+}
+
+.isLoss {
+	background-color: #ff7675;
+}

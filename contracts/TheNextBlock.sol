@@ -134,10 +134,23 @@ contract TheNextBlock {
             if(_miner == block.coinbase) {
                 playersPoints[msg.sender] = playersPoints[msg.sender].add(1);
                 if(playersPoints[msg.sender] == requiredPoints) {
-                    Jackpot(msg.sender, safeGetPercent(prizePool, prizePoolPercent));
-                    playersStorage[msg.sender].balance = playersStorage[msg.sender].balance.add(safeGetPercent(prizePool, prizePoolPercent));
-                    prizePool = prizePool.sub(safeGetPercent(prizePool, prizePoolPercent));
-                    playersPoints[msg.sender] = 0;
+                    /**
+                    * Here comes complicated part.
+                    * If player won jackpot but there is no ether
+                    * on the balance we give him a chance and decrease
+                    * points by one instead of setting it to 0.
+                    * There must be more ether than allowedBetAmount.
+                    */
+                    if(prizePool >= allowedBetAmount) {
+                        uint256 amount = safeGetPercent(prizePool, prizePoolPercent);
+                        Jackpot(msg.sender, amount);
+                        playersStorage[msg.sender].balance = playersStorage[msg.sender].balance.add(amount);
+                        prizePool = prizePool.sub(amount);
+                        playersPoints[msg.sender] = 0;
+                    } else {
+                        Jackpot(msg.sender, 0);
+                        playersPoints[msg.sender]--;
+                    }
                 }
             } else {
                 playersPoints[msg.sender] = 0;
