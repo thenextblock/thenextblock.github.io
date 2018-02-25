@@ -1,15 +1,22 @@
+/* global $ */
+/* global Vue */
+/* global web3 */
+/* global alertify */
+/* global Web31 */
+/* global Web3 */
 var app;
 $(document).ready(function() {
     app = new Vue({
-        el: '#app',
+        el: "#app",
         data: {
-			isAppVisible: false,
+            etherscanDomain: "etherscan.io",
+            isAppVisible: false,
             isInfoDialogVisible: true,
-			isTest: true,
-			bets: [],
-			web31: null,
-			web31Addr: "wss://node1.thenextblock.com/ws/",
-			web31Contract: null,
+            bets: [],
+            web31: null,
+            //web31Addr: "wss://node1.thenextblock.com/ws/",
+            web31Addr: "wss://qubit.ge/ws/",
+            web31Contract: null,
             contract: {
                 addr: "0x081b04164607087b5301bbb95f67ad2630e15786"
             },
@@ -18,32 +25,27 @@ $(document).ready(function() {
                 balance: 0
             },
             blocks: [],
-            minerNames: {
-                "0xea674fdde714fd979de3edf0f56aa9716b898ec8": "Ethermine",
-                "0x829bd824b016326a401d083b33d092293333a830": "f2pool_2",
-                "0x5a0b54d5dc17e0aadc383d2db43b0a0d3e029c4c": "ethfans.org_2",
-                "0xb2930b35844a230f00e51431acae96fe543a0347": "miningpoolhub_1",
-                "0x2a65aca4d5fc5b5c859090a6c34d164135398226": "DwarfPool1",
-                "0xf3b9d2c81f2b24b0fa0acaaa865b7d9ced5fc2fb": "bitclubpool",
-                "0x4bb96091ee9d802ed039c4d1a5f6216f90f81b01": "Ethpool_2",
-                "0x6a7a43be33ba930fe58f34e07d0ad6ba7adb9b1f": "Coinotron_2",
-                "0x9435d50503aee35c8757ae4933f7a0ab56597805": "waterhole"
-            },
+            minerNames: {},
             blockCount: 0,
             blockCountOptions: [],
             player: {
                 balance: 0,
                 points: 0,
                 pot: 0,
-				allowedBetAmount: 0
+                allowedBetAmount: 0
             }
         },
-		computed: {
-			isMainnet: function() {
-				return this.metamask.web3 && this.metamask.web3.version.network == "1";
-			},
-			hasWeb3: function() {
-                return typeof web3 !== 'undefined' && web3.currentProvider;
+        watch: {
+            minerNames: function(val) {
+                return val;
+            }
+        },
+        computed: {
+            isMainnet: function() {
+                return this.metamask.web3 && this.metamask.web3.version.network == "1";
+            },
+            hasWeb3: function() {
+                return typeof web3 !== "undefined" && web3.currentProvider;
             },
             hasMetamask: function() {
                 return web3.currentProvider.isMetaMask && web3.currentProvider.isConnected();
@@ -51,12 +53,12 @@ $(document).ready(function() {
             isMetaMaskLocked: function() {
                 return this.metamask.web3 && !this.metamask.web3.eth.accounts.length;
             },
-			isButtonDisabled: function() {
-				return !this.hasWeb3 || !this.hasMetamask || this.isMetaMaskLocked;
-			}
-		},
+            isButtonDisabled: function() {
+                return !this.hasWeb3 || !this.hasMetamask || this.isMetaMaskLocked;
+            }
+        },
         methods: {
-			sortBlocks: function() {
+            sortBlocks: function() {
                 var _this = this;
                 _this.blocks = _this.blocks.sort(function(a, b) {
                     if (a.number < b.number) {
@@ -70,11 +72,11 @@ $(document).ready(function() {
             },
             addBlock: function(block) {
                 var _this = this;
-				_this.blocks.push(block);
-				_this.sortBlocks();
-				if(_this.blocks.length > _this.blockCount){
-					_this.blocks.splice(-1, 1);
-				}
+                _this.blocks.unshift(block);
+                _this.sortBlocks();
+                if (_this.blocks.length > _this.blockCount) {
+                    _this.blocks.splice(-1, 1);
+                }
             },
             loadBlocks: function(bc) {
                 var _this = this;
@@ -82,12 +84,14 @@ $(document).ready(function() {
                 bc = bc || _this.blockCount;
                 _this.web31.eth.getBlockNumber(function(err, value) {
                     if (err) {
-						alertify.error("Can't get last block number!");
-						return;
-					};
+                        alertify.error("Can't get last block number!");
+                        return;
+                    };
                     _this.metamask.lastBlockNumber = value;
                     for (var i = 0; i < bc; i++)
-                        _this.web31.eth.getBlock(value - i).then(_this.addBlock).error(function(err){ alertify.error("Can't get block info! " + err) });
+                        _this.web31.eth.getBlock(value - i).then(_this.addBlock).error(function(err) {
+                            alertify.error("Can't get block info! " + err)
+                        });
                 });
             },
             getMinersBlockCount: function(miner) {
@@ -106,7 +110,7 @@ $(document).ready(function() {
                     _this.metamask.address = accounts[0];
                     _this.metamask.web3.eth.getBalance(_this.metamask.address, function(err, balance) {
                         if (!err)
-                            _this.metamask.balance = _this.formatFloat(_this.metamask.web3.fromWei(balance, 'ether').toFixed());
+                            _this.metamask.balance = _this.formatFloat(_this.metamask.web3.fromWei(balance, "ether").toFixed());
                     });
                 });
             },
@@ -120,10 +124,10 @@ $(document).ready(function() {
             loadContractData: function() {
                 var _this = this;
                 _this.contract.cls.getPrizePool(function(err, val) {
-                    if (!err) _this.player.pot = _this.formatFloat(_this.web31.utils.fromWei(val.toString(), 'ether'));
+                    if (!err) _this.player.pot = _this.formatFloat(_this.web31.utils.fromWei(val.toString(), "ether"));
                 });
                 _this.contract.cls.getMyBalance(function(err, val) {
-                    if (!err) _this.player.balance = _this.formatFloat(_this.web31.utils.fromWei(val.toString(), 'ether'));
+                    if (!err) _this.player.balance = _this.formatFloat(_this.web31.utils.fromWei(val.toString(), "ether"));
                 });
                 _this.contract.cls.getMyGuessCount(function(err, val) {
                     if (!err) _this.player.points = val.toString();
@@ -134,85 +138,91 @@ $(document).ready(function() {
             },
             placeBet: function(miner) {
                 var _this = this;
-				console.log(miner);
+                console.log(miner);
                 _this.contract.cls.placeBet(miner, {
                     from: _this.metamask.web3.eth.accounts[0],
                     value: _this.player.allowedBetAmount,
                     gas: 4000000,
                     gasPrice: 35000000000
-                }, function(err, result){
-					console.log(arguments);
-					if(err){
-						alertify.error("Bet Rejected!");
-					}
-				});
+                }, function(err, result) {
+                    console.log(arguments);
+                    if (err) {
+                        alertify.error("Bet Rejected!");
+                    }
+                });
             },
             formatFloat: function(number, factor) {
-                //return parseFloat(Math.round(number * 100) / 100).toFixed(5);
                 return parseFloat(number).toFixed(factor || 5);
             },
             getEtherScanAddressLink: function(address) {
-                return "https://etherscan.io/address/{{address}}".replace('{{address}}', address);
+                return "https://{{domain}}/address/{{address}}".replace("{{address}}", address).replace("{{domain}}", this.etherscanDomain);
             },
             getEtherScanBlockLink: function(blockNumber) {
-                return "https://etherscan.io/block/{{blockNumber}}".replace('{{blockNumber}}', blockNumber);
+                return "https://{{domain}}/block/{{blockNumber}}".replace("{{blockNumber}}", blockNumber).replace("{{domain}}", this.etherscanDomain);
             },
-            shortenStr: function(str = "", topBottomRem = 5) {
+            shortenStr: function(str = '', topBottomRem = 5) {
                 return str.substr(0, topBottomRem) + '...' + str.substr(str.length - topBottomRem, topBottomRem);
             },
             onNewBlockMined: function(err, result) {
                 var _this = this;
-				if(!_this.isButtonDisabled){
-					_this.loadAccount();
-					_this.loadContractData();
-				}
+                if (!_this.isButtonDisabled) {
+                    _this.loadAccount();
+                    _this.loadContractData();
+                }
                 if (err) {
-                    alertify.error("Error: Can't receive block event");
+                    alertify.error("Error: Can't receive block event!");
                 } else {
-					alertify.success("New Block Mined: " + result.number);
-					_this.addBlock(result);
-					var newRow = $('table tbody tr:first');
-					newRow.addClass('is-selected');
-					setTimeout(function(){ newRow.removeClass('is-selected'); }, 3000);
+                    alertify.success('New Block Mined: ' + result.number);
+                    _this.addBlock(result);
+                    var newRow = $('table tbody tr:first');
+                    newRow.addClass('is-selected');
+                    setTimeout(function() {
+                        newRow.removeClass('is-selected');
+                    }, 3000);
                 }
             },
             onBetReceived: function(err, result) {
+                if (err) {
+                    alertify.error("Can't receive bet event!");
+                    return;
+                }
                 var _this = this;
-				console.log("bet received", arguments);
-				_this.bets.unshift(result);
+                _this.bets.unshift(result);
             },
-			onJackpot: function(err, result) {
+            onJackpot: function(err, result) {
+                if (err) {
+                    alertify.error("Can't receive jackpot event!");
+                    return;
+                }
                 var _this = this;
-				console.log("jackpot ", arguments);
-				alertify.success("Someone won jackpot");
+                alertify.success('Someone won jackpot!');
             },
-			withdrawBalance: function() {
-				var _this = this;
-				if(_this.player.balance <= 0){
-					alertify.error("Your balance is empty!");
-					return;
-				}
-			},
-			compareAddr: function(addr1, addr2) {
-				return addr1.toLowerCase() == addr2.toLowerCase();
-			}
+            withdrawBalance: function() {
+                var _this = this;
+                if (_this.player.balance <= 0) {
+                    alertify.error("Your balance is empty!");
+                    return;
+                }
+
+            },
+            compareAddr: function(addr1, addr2) {
+                return addr1.toLowerCase() == addr2.toLowerCase();
+            }
         },
         created: function() {
             var _this = this;
             _this.web31 = new Web31(new Web31.providers.WebsocketProvider(_this.web31Addr));
-
-            $.getJSON('/build/contracts/TheNextBlock.json', function(data) {
-                
+            $.getJSON("/build/contracts/TheNextBlock.json", function(data) {
                 _this.contract.abi = data.abi;
                 if (_this.hasWeb3) {
                     _this.metamask.web3 = new Web3(web3.currentProvider);
                     if (!_this.hasMetamask) {
-                        alertify.alert('Error', 'Metamask is not connected.', function() {
-                            alertify.error('Check Metamask and refresh website!');
+                        alertify.alert("Error", "Metamask is not connected.", function() {
+                            alertify.error("Check Metamask and refresh website!");
                         });
                     } else if (_this.isMetaMaskLocked) {
-                        alertify.alert('Error', "Metamask is locked.", function() {
-                            alertify.error('Unlock Metamask and refresh website.');
+                        alertify.alert("Error", "Metamask is locked.", function() {
+                            alertify.error("Unlock Metamask and refresh website.");
                         });
                     } else {
                         _this.contract.cls = _this.metamask.web3.eth.contract(_this.contract.abi).at(_this.contract.addr);
@@ -229,12 +239,19 @@ $(document).ready(function() {
                 _this.web31.eth.subscribe('newBlockHeaders', _this.onNewBlockMined);
                 _this.web31Contract = new _this.web31.eth.Contract(_this.contract.abi, _this.contract.addr);
                 _this.web31Contract.events.BetReceived({}, _this.onBetReceived);
-                _this.web31Contract.events.Jackpot({}, _this.onJackpot);    
+                _this.web31Contract.events.Jackpot({}, _this.onJackpot);
                 _this.isAppVisible = true;
                 $("body").show();
-            }).fail(function(){
+            }).fail(function() {
                 alertify.error("Can't load contract abi.");
             });
+            /*$.getJSON('/assets/js/miners.json', function(data) {
+                for(var k in data) _this.$set(_this.minerNames, k, data[k]);
+                //_this.minerNames = data;
+                _this.isAppVisible = true;
+            }).fail(function() {
+                alertify.error('Canot load miner names!');
+            });*/
         }
     });
 });
