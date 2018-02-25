@@ -14,8 +14,8 @@ $(document).ready(function() {
             isInfoDialogVisible: true,
             bets: [],
             web31: null,
-            //web31Addr: "wss://node1.thenextblock.com/ws/",
-            web31Addr: "wss://qubit.ge/ws/",
+            web31Addr: "wss://node1.thenextblock.com/ws/",
+            //web31Addr: "wss://qubit.ge/ws/",
             web31Contract: null,
             contract: {
                 addr: "0x081b04164607087b5301bbb95f67ad2630e15786"
