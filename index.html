@@ -148,10 +148,10 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-bind:class="{ 'is-selected': (bet.returnValues.betOnMiner == bet.returnValues.miner) }" v-for="(bet, index) in bets">
-                                    <td><span v-if="compareAddr(bet.returnValues.sender, metamask.address)">(You)</span> {{bet.returnValues.sender}}</td>
-                                    <td>{{bet.returnValues.betOnMiner}}</td>
-                                    <td>{{bet.returnValues.miner}}</td>
+                                <tr v-bind:class="{ 'isWin': compareAddr(bet.returnValues.betOnMiner, bet.returnValues.miner), 'isLoss' : !compareAddr(bet.returnValues.betOnMiner, bet.returnValues.miner) }" v-for="(bet, index) in bets">
+                                    <td><span v-if="compareAddr(bet.returnValues.sender, metamask.address)">(You)</span> <a target="_blank" v-bind:href="getEtherScanAddressLink(bet.returnValues.sender)">{{bet.returnValues.sender}}</a> {{ compareAddr(bet.returnValues.betOnMiner, bet.returnValues.miner) ? '(Win)' : '(Loss)' }}</td>
+                                    <td><a target="_blank" v-bind:href="getEtherScanAddressLink(bet.returnValues.betOnMiner)">{{bet.returnValues.betOnMiner}}</a></td>
+                                    <td><a target="_blank" v-bind:href="getEtherScanAddressLink(bet.returnValues.miner)">{{bet.returnValues.miner}}</a></td>
                                 </tr>
                             </tbody>
                         </table>
