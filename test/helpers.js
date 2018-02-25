@@ -28,4 +28,4 @@ function getParamFromTxEvent(transaction, paramName, contractFactory, eventName)
 
 
 
-module.exports = { should, EVMThrow, getParamFromTxEvent }
+module.exports = { should, EVMThrow, getParamFromTxEvent, BigNumber }
