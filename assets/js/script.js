@@ -18,7 +18,7 @@ var state = {
         //web31Addr: "wss://qubit.ge/ws/",
         web31Contract: null,
         contract: {
-            addr: "0x081b04164607087b5301bbb95f67ad2630e15786"
+            addr: "0x0985AEa6C3E9283d2c83e1136b7AE077e61735f1"
         },
         metamask: {
             address: "",
@@ -32,7 +32,8 @@ var state = {
             balance: 0,
             points: 0,
             pot: 0,
-            allowedBetAmount: 0
+            allowedBetAmount: 0,
+            totalBetCount: 0
         }
     },
     computed: {
@@ -210,6 +211,7 @@ var state = {
                 return;
             }
             _this.contract.cls.withdrawMyFunds({
+                from: _this.metamask.web3.eth.accounts[0],
                 gas: 4000000,
                 gasPrice: 35000000000
             }, function(err, result) {
