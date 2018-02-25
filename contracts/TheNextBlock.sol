@@ -144,20 +144,25 @@ contract TheNextBlock {
             }
     }
 
+    function getPlayerData(address playerAddr) public view returns(uint256 lastBlock, uint256 balance) {
+        balance =  playersStorage[playerAddr].balance;
+        lastBlock =  playersStorage[playerAddr].lastBlock;
+    }
+
     function getPlayersBalance(address playerAddr) public view returns(uint256) {
         return playersStorage[playerAddr].balance;
     }
     
-    function getPlayersGuessCount(address playerAddr) public view returns(uint256) {
+    function getPlayersPoints(address playerAddr) public view returns(uint256) {
         return playersPoints[playerAddr];
+    }
+
+    function getMyPoints() public view returns(uint256) {
+        return playersPoints[msg.sender];
     }
     
     function getMyBalance() public view returns(uint256) {
         return playersStorage[msg.sender].balance;
-    }
-    
-    function getMyGuessCount() public view returns(uint256) {
-        return playersPoints[msg.sender];
     }
     
     function withdrawMyFunds() public {
