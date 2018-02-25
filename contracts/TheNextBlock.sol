@@ -33,34 +33,51 @@ library SafeMath {
   }
 }
 
+/**
+ * @title TheNextBlock
+ * @dev This is smart contract for dapp game
+ * in which players bet to guess miner of their transactions.
+ */
 contract TheNextBlock {
-
+    
     using SafeMath for uint256;
-    using SafeMath for uint8;
-
-    event BetReceived(address sender, uint256 value, address betOnMiner, address miner, uint256 balance);
-    event GivingBackTheRest(address sender, uint256 value, uint256 rest);
-    event Jackpot(address winner);
+    
+    event BetReceived(address sender, address betOnMiner, address miner);
+    event Jackpot(address winner, uint256 amount);
     
     struct Owner {
         uint256 balance;
         address addr;
     }
     
-    
     Owner public owner;
-    uint256 public allowedBetAmount = 10000000000000000; // 0.01 ETH
-    uint8 public requiredPoints = 5;
-    uint8 public ownerProfitPercent = 10; // Contract owner  
-    uint8 public prizePoolPercent = 70; // We reserve 20 % for next prizepool 
+    
+    /**
+    * This is exact amount of ether player can bet.
+    * If bet is less than this amount, transaction is reverted.
+    * If moore, contract will send excess amout back to player.
+    */
+    uint256 public allowedBetAmount = 10000000000000000;
+    /**
+    * You need to guess requiredPoints times in a row to win jackpot.
+    */
+    uint256 public requiredPoints = 5;
+    /**
+    * Every bet is split: 10% to owner, 70% to prize pool
+    * we preserve 20% for next prize pool
+    */
+    uint256 public ownerProfitPercent = 10;
+    uint256 public prizePoolPercent = 70; 
     uint256 public prizePool = 0;
+    uint256 public totalBetCount = 0;
+    
     struct Player {
         uint256 balance;
         uint256 lastBlock;
     }
     
     mapping(address => Player) public playersStorage;
-    mapping(address => uint8) public playersPoints;
+    mapping(address => uint256) public playersPoints;
     
     modifier onlyOwner() {
         require(msg.sender == owner.addr);
@@ -74,8 +91,6 @@ contract TheNextBlock {
 
     modifier notMore() {
         if(msg.value > allowedBetAmount) {
-
-            GivingBackTheRest(msg.sender, msg.value,  SafeMath.sub(msg.value, allowedBetAmount));
             msg.sender.transfer( SafeMath.sub(msg.value, allowedBetAmount) );
         }
         _;
@@ -88,15 +103,22 @@ contract TheNextBlock {
         _;
     }
     
-    function safeGetPercent(uint256 amount, uint8 percent) private pure returns(uint256) {
-        return SafeMath.mul( SafeMath.div( SafeMath.sub(amount, amount%100), 100), percent);
+    function safeGetPercent(uint256 amount, uint256 percent) private pure returns(uint256) {
+        return SafeMath.mul( SafeMath.div( SafeMath.sub(amount, amount%100), 100), percent );
     }
     
     function TheNextBlock() public {
         owner.addr = msg.sender;
     }
 
-    function () public payable { }
+    /**
+     * This is left for donations.
+     * Ether received in this(fallback) function
+     * will appear on owners balance.
+     */
+    function () public payable {
+         owner.balance = owner.balance.add(msg.value);
+    }
 
     function placeBet(address _miner) 
         public
@@ -104,25 +126,18 @@ contract TheNextBlock {
         notLess
         notMore
         onlyOnce {
-            
-            BetReceived(msg.sender, msg.value, _miner, block.coinbase,  this.balance);
-
+            totalBetCount = totalBetCount.add(1);
+            BetReceived(msg.sender, _miner, block.coinbase);
             owner.balance = owner.balance.add(safeGetPercent(allowedBetAmount, ownerProfitPercent));
-            prizePool = prizePool.add(safeGetPercent(allowedBetAmount, prizePoolPercent));
-
+            //Owner takes his percent and prizepool everyhing else
+            prizePool = prizePool.add(safeGetPercent(allowedBetAmount, SafeMath.sub(100, ownerProfitPercent)));
             if(_miner == block.coinbase) {
-                
                 playersPoints[msg.sender] = playersPoints[msg.sender].add(1);
-
                 if(playersPoints[msg.sender] == requiredPoints) {
-                    Jackpot(msg.sender);
-                    if(prizePool >= allowedBetAmount) {
-                        playersStorage[msg.sender].balance = playersStorage[msg.sender].balance.add(prizePool);
-                        prizePool = prizePool.sub( safeGetPercent(allowedBetAmount, prizePoolPercent) );
-                        playersPoints[msg.sender] = 0;
-                    } else {
-                        playersPoints[msg.sender] = playersPoints[msg.sender].sub(1); // Unlucky player, he had a chanse to won this prize pool, but we cant manage transaction ordering :( 
-                    }
+                    Jackpot(msg.sender, safeGetPercent(prizePool, prizePoolPercent));
+                    playersStorage[msg.sender].balance = playersStorage[msg.sender].balance.add(safeGetPercent(prizePool, prizePoolPercent));
+                    prizePool = prizePool.sub(safeGetPercent(prizePool, prizePoolPercent));
+                    playersPoints[msg.sender] = 0;
                 }
             } else {
                 playersPoints[msg.sender] = 0;
@@ -133,7 +148,7 @@ contract TheNextBlock {
         return playersStorage[playerAddr].balance;
     }
     
-    function getPlayersGuessCount(address playerAddr) public view returns(uint8) {
+    function getPlayersGuessCount(address playerAddr) public view returns(uint256) {
         return playersPoints[playerAddr];
     }
     
@@ -141,12 +156,8 @@ contract TheNextBlock {
         return playersStorage[msg.sender].balance;
     }
     
-    function getMyGuessCount() public view returns(uint8) {
+    function getMyGuessCount() public view returns(uint256) {
         return playersPoints[msg.sender];
-    }
-    
-    function getMyWonBlocks() public view returns(uint256[]) {
-        return playersStorage[msg.sender].wonBlocks;
     }
     
     function withdrawMyFunds() public {
@@ -158,8 +169,9 @@ contract TheNextBlock {
     }
     
     function withdrawOwnersFunds() public onlyOwner {
-        owner.addr.transfer(owner.balance);
+        uint256 balance = owner.balance;
         owner.balance = 0;
+        owner.addr.transfer(balance);
     }
     
     function getOwnersBalance() public view returns(uint256) {
