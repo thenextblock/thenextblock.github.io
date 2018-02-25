@@ -262,8 +262,8 @@ var state = {
 $(document).ready(function() {
     $.getJSON("/build/contracts/TheNextBlock.json", function(contractData) {
         state.data.contract.abi = contractData.abi;
-        $.getJSON('/assets/js/miners.json', function(data) {
-            data.minerNames = data;
+        $.getJSON('/assets/js/miners.json', function(miners) {
+            state.data.minerNames = miners;
             app = new Vue(state);
         }).fail(function() {
             alertify.error('Canot load miner names!');
