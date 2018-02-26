@@ -155,7 +155,7 @@ var state = {
                     alertify.error('Bet Rejected!');
                     return;
                 }
-                alertify.success('Bet submitted!  <a style="color: #0984e3;" target="_blank" href="' + _this.getEtherScanTxLink(result) + '">Transaction Link</a>', 10);
+                alertify.success('Bet submitted!  <a style="color: #0984e3;" target="_blank" href="' + _this.getEtherScanTxLink(result) + '">Transaction Link</a>', -1);
             });
         },
         formatFloat: function(number, factor) {
@@ -180,7 +180,6 @@ var state = {
                 _this.loadContractData();
             }
             if (err) {
-                console.log('error: ', err);
                 this.handlerSocketError(err);
                 alertify.error("Error: Can't receive block event!");
             } else {
@@ -195,7 +194,6 @@ var state = {
         },
         onBetReceived: function(err, result) {
             if (err) {
-                console.log('error: ', err);
                 this.handlerSocketError(err);
                 alertify.error("Can't receive bet event!");
                 return;
@@ -205,7 +203,6 @@ var state = {
         },
         onJackpot: function(err, result) {
             if (err) {
-                console.log('error: ', err);
                 this.handlerSocketError(err);
                 alertify.error("Can't receive jackpot event!");
                 return;
@@ -214,7 +211,7 @@ var state = {
             var someone = 'Someone';
             if(result.returnValues.winner == this.metamask.address)
                 someone = 'You';
-            alertify.success(someone + ' won Jackpot! ' + _this.formatFloat(_this.web31.utils.fromWei(result.returnValues.amount.toString(), "ether")));
+            alertify.success(someone + ' won Jackpot! ' + _this.formatFloat(_this.web31.utils.fromWei(result.returnValues.amount.toString(), "ether")), -1);
         },
         withdrawBalance: function() {
             var _this = this;
@@ -231,9 +228,8 @@ var state = {
                     alertify.error('Rejected!');
                     return;
                 }
-                alertify.success('Submitted!  <a style="color: #0984e3;" target="_blank" href="' + _this.getEtherScanTxLink(result) + '">Transaction Link</a>', 10);
+                alertify.success('Submitted!  <a style="color: #0984e3;" target="_blank" href="' + _this.getEtherScanTxLink(result) + '">Transaction Link</a>', -1);
             });
-
         },
         compareAddr: function(addr1, addr2) {
             return addr1.toLowerCase() == addr2.toLowerCase();
