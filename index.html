@@ -152,9 +152,19 @@
                             </thead>
                             <tbody>
                                 <tr v-bind:class="{ 'isWin': compareAddr(bet.returnValues.betOnMiner, bet.returnValues.miner), 'isLoss' : !compareAddr(bet.returnValues.betOnMiner, bet.returnValues.miner) }" v-for="(bet, index) in bets">
-                                    <td><span v-if="compareAddr(bet.returnValues.sender, metamask.address)">(You)</span> <a target="_blank" v-bind:href="getEtherScanAddressLink(bet.returnValues.sender)">{{bet.returnValues.sender}}</a> {{ compareAddr(bet.returnValues.betOnMiner, bet.returnValues.miner) ? '(Win)' : '(Loss)' }}</td>
-                                    <td><a target="_blank" v-bind:href="getEtherScanAddressLink(bet.returnValues.betOnMiner)">{{bet.returnValues.betOnMiner}}</a></td>
-                                    <td><a target="_blank" v-bind:href="getEtherScanAddressLink(bet.returnValues.miner)">{{bet.returnValues.miner}}</a></td>
+                                    <td>
+                                        <span v-if="compareAddr(bet.returnValues.sender, metamask.address)"> <strong>(You)</strong> </span>
+                                        <a target="_blank" v-bind:href="getEtherScanAddressLink(bet.returnValues.sender)">{{shortenStr(bet.returnValues.sender, 10)}}</a>
+                                        <strong>{{ compareAddr(bet.returnValues.betOnMiner, bet.returnValues.miner) ? '(Win)' : '(Loss)' }}</strong>
+                                    </td>
+                                    <td>
+                                        <a target="_blank" v-bind:href="getEtherScanAddressLink(bet.returnValues.betOnMiner)">{{shortenStr(bet.returnValues.betOnMiner, 10)}}</a>
+                                        <span v-show="minerNames[bet.returnValues.betOnMiner.toLowerCase()]" class="tag is-link"><b>{{minerNames[bet.returnValues.betOnMiner.toLowerCase()]}}</b></span>
+                                    </td>
+                                    <td>
+                                        <a target="_blank" v-bind:href="getEtherScanAddressLink(bet.returnValues.miner)">{{shortenStr(bet.returnValues.miner, 10)}}</a>
+                                        <span v-show="minerNames[bet.returnValues.miner.toLowerCase()]" class="tag is-link"><b>{{minerNames[bet.returnValues.miner.toLowerCase()]}}</b></span>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>

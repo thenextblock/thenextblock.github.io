@@ -4,6 +4,9 @@
 /* global alertify */
 /* global Web31 */
 /* global Web3 */
+/* global location */
+/* global CloseEvent */
+
 var app;
 var state = { 
     el: '#app',
@@ -177,6 +180,8 @@ var state = {
                 _this.loadContractData();
             }
             if (err) {
+                console.log('error: ', err);
+                this.handlerSocketError(err);
                 alertify.error("Error: Can't receive block event!");
             } else {
                 alertify.success('New Block Mined: ' + result.number);
@@ -190,6 +195,8 @@ var state = {
         },
         onBetReceived: function(err, result) {
             if (err) {
+                console.log('error: ', err);
+                this.handlerSocketError(err);
                 alertify.error("Can't receive bet event!");
                 return;
             }
@@ -198,6 +205,8 @@ var state = {
         },
         onJackpot: function(err, result) {
             if (err) {
+                console.log('error: ', err);
+                this.handlerSocketError(err);
                 alertify.error("Can't receive jackpot event!");
                 return;
             }
@@ -228,6 +237,12 @@ var state = {
         },
         compareAddr: function(addr1, addr2) {
             return addr1.toLowerCase() == addr2.toLowerCase();
+        },
+        handlerSocketError: function(err) {
+            if(err instanceof CloseEvent || err.type == 'close')
+                alertify.alert('Error', 'Seems like websocket lost connection. Click ok to reload website.', function() {
+                    location.reload();
+                });
         }
     },
     created: function() {
