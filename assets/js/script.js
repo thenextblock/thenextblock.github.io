@@ -36,7 +36,8 @@ var state = {
             points: 0,
             pot: 0,
             allowedBetAmount: 0,
-            totalBetCount: 0
+            totalBetCount: 0,
+            requiredPoints: 0
         }
     },
     computed: {
@@ -141,6 +142,9 @@ var state = {
             });
             _this.contract.cls.totalBetCount(function(err, val) {
                 if (!err) _this.player.totalBetCount = val.toString();
+            });
+            _this.contract.cls.requiredPoints(function(err, val) {
+                if (!err) _this.player.requiredPoints = val.toString();
             });
         },
         placeBet: function(miner) {

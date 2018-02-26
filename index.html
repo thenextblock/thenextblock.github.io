@@ -47,6 +47,9 @@
                     <div class="navbar-item">
                         <span><b>Total Bets: {{ player.totalBetCount }}</b></span>
                     </div>
+                    <div class="navbar-item">
+                        <span><b>Required Points: {{player.requiredPoints}}</b></span>
+                    </div>
                 </div>
 
                 <div class="navbar-end" id="account">
@@ -101,7 +104,7 @@
                                 <ul>
                                     <li> Each account (public address) is able place only one bet per block. </li>
                                     <li>If a player predicts the correct miner they will earn one point. </li>
-                                    <li>If a player predicts (guesses) correctly in 5 consecutive bets and thus earns 5 points, hi is the winner and will receive 90% of the total pool (the bets collected). </li>
+                                    <li>If a player predicts (guesses) correctly in {{player.requiredPoints}} consecutive bets and thus earns {{player.requiredPoints}} points, hi is the winner and will receive 90% of the total pool (the bets collected). </li>
 
                                     <li>If the player does not correctly predict the miner, his/her points will be reduced to zero. </li>
                                 </ul>
