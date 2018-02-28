@@ -103,7 +103,7 @@ var state = {
             var _this = this;
             var count = 0;
             _this.blocks.forEach(function(el) {
-                if (el.miner == miner)
+                if (_this.compareAddr(el.miner, miner))
                     count++;
             });
             return count;
@@ -213,7 +213,7 @@ var state = {
             }
             var _this = this;
             var someone = 'Someone';
-            if(result.returnValues.winner == this.metamask.address)
+            if(_this.compareAddr(result.returnValues.winner, this.metamask.address))
                 someone = 'You';
             alertify.success(someone + ' won Jackpot! ' + _this.formatFloat(_this.web31.utils.fromWei(result.returnValues.amount.toString(), "ether")), -1);
         },
