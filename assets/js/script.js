@@ -21,7 +21,7 @@ var state = {
         web31Addr: "wss://node1.thenextblock.com/ws/",
         web31Contract: null,
         contract: {
-            addr: "0x0985AEa6C3E9283d2c83e1136b7AE077e61735f1"
+            addr: "0xcf70f36f8fd04713b33900bab530fd2f63ed9ae0"
         },
         metamask: {
             address: "",
