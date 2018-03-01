@@ -57,11 +57,11 @@ contract TheNextBlock {
     * If bet is less than this amount, transaction is reverted.
     * If moore, contract will send excess amout back to player.
     */
-    uint256 public allowedBetAmount = 10000000000000000;
+    uint256 public allowedBetAmount = 5000000000000000; // 0.005 ETH
     /**
     * You need to guess requiredPoints times in a row to win jackpot.
     */
-    uint256 public requiredPoints = 5;
+    uint256 public requiredPoints = 3;
     /**
     * Every bet is split: 10% to owner, 70% to prize pool
     * we preserve 20% for next prize pool
@@ -213,14 +213,6 @@ contract TheNextBlock {
         
     function changeOwner(address newOwner) public onlyOwner {
         owner.addr = newOwner;
-    }
-
-    function changeAllowedBetAmount(uint256 newAmount) public onlyOwner {
-        allowedBetAmount = newAmount;
-    }
-
-    function changeRequiredPoints(uint8 newRequiredPoints) public onlyOwner {
-        requiredPoints = newRequiredPoints;
     }
 
 }
