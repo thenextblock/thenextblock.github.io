@@ -26,7 +26,7 @@
             <div class="navbar-menu">
                 <div class="navbar-start">
                     <div class="navbar-item">
-                        <a v-on:click="isInfoDialogVisible = !isInfoDialogVisible" class="button is-info" v-tooltip.bottom="'Bet on this mine'">
+                        <a v-on:click="isInfoDialogVisible = !isInfoDialogVisible" class="button is-info" v-tooltip.bottom="'Make a bet if you believe that this miner will mine your transaction.'">
 							<span class="icon">
 							  <i class="fas fa-question-circle"></i>
 							</span>
@@ -96,19 +96,18 @@
                                 <button class="delete" aria-label="delete" v-on:click="isInfoDialogVisible = false"></button>
                             </div>
                             <div class="message-body">
-                                The Next Block
-                                <br> The Next Block is a blockchain-based game in which users must predict which miner will mines the transaction sent by players.
-                                <br>
-                                <strong> Game Rules: </strong>
-                                <br>
-                                <ul>
-                                    <li> Each account (public address) is able place only one bet per block. </li>
-                                    <li>If a player predicts the correct miner they will earn one point. </li>
-                                    <li>If a player predicts (guesses) correctly in {{player.requiredPoints}} consecutive bets and thus earns {{player.requiredPoints}} points, hi is the winner and will receive 90% of the total pool (the bets collected). </li>
-
-                                    <li>If the player does not correctly predict the miner, his/her points will be reduced to zero. </li>
-                                </ul>
-                                <strong>The total prize are collected from players' bets until one player correctly predicts 5 miners in a row. It is not necessary bet on  each block; it is up to you where to place your bets. </strong>
+                                <h2 class="title">The Next Block</h2>
+                                <p>The Next Block is a blockchain game, where player predicts which miner will mine his transaction.</p>
+                                <p>Player can place  1 bet per block. If a player predicts the correct miner, he earns 1 point. The game lasts till someone gets to {{player.requiredPoints}} points, winner gets 70% of prize pool, 20% will be collected  to the next prize pool.</p>
+                                <strong>Game Rules:</strong>
+                                <div style="margin-left: 40px;">
+                                    <ol type="1">
+                                        <li>If player doesn’t predict the correct block miner, he will lose all points or if other player wins the prize pool all other players points reduce to 0.</li>
+                                        <li>Players bets are collected to the prize pool plus the 20% from the preview pool.</li>
+                                        <li>Players can skip the blocks without losing points.</li>
+                                    </ol>
+                                </div>
+                                <strong>The total prize are collected from players' bets until one player correctly predicts {{player.requiredPoints}} miners in a row. It is not necessary bet on  each block; it is up to you where to place your bets. </strong>
                             </div>
                         </article>
                     </div>
@@ -139,7 +138,7 @@
 										</span>
                                         <span v-show="minerNames[block.miner.toLowerCase()]" class="tag is-link"><b>{{minerNames[block.miner.toLowerCase()]}}</b></span>
                                     </td>
-                                    <td><button :disabled="isButtonDisabled" v-on:click="placeBet(block.miner)" class="button is-success" v-tooltip.bottom="'Bet that this miner will mine your transaction.'">BET</button></td>
+                                    <td><button :disabled="isButtonDisabled" v-on:click="placeBet(block.miner)" class="button is-success" v-tooltip.bottom="'Make a bet if you believe that this miner will mine your transaction.'">BET</button></td>
                                 </tr>
                             </tbody>
                         </table>
