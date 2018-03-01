@@ -11,7 +11,7 @@ var app;
 var state = { 
     el: '#app',
     data: {
-        etherscanDomain: "ropsten.etherscan.io",
+        etherscanDomain: "etherscan.io",
         isAppVisible: false,
         isInfoDialogVisible: true,
         isTestNetWarningVisible: false,
@@ -152,8 +152,8 @@ var state = {
             _this.contract.cls.placeBet(miner, {
                 from: _this.metamask.web3.eth.accounts[0],
                 value: _this.player.allowedBetAmount,
-                gas: 4000000,
-                gasPrice: 35000000000
+                gas: '500000',
+                gasPrice: '35000000000'
             }, function(err, result) {
                 if (err) {
                     alertify.error('Bet Rejected!');
@@ -227,8 +227,8 @@ var state = {
             }
             _this.contract.cls.withdrawMyFunds({
                 from: _this.metamask.web3.eth.accounts[0],
-                gas: 4000000,
-                gasPrice: 35000000000
+                gas: '500000',
+                gasPrice: '35000000000'
             }, function(err, result) {
                 if (err) {
                     alertify.error('Rejected!');
