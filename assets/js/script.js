@@ -16,6 +16,7 @@ var state = {
         isInfoDialogVisible: true,
         isTestNetWarningVisible: false,
         bets: [],
+        myBets: [],
         web31: null,
         web31Addr: "wss://node1.thenextblock.com/ws/",
         //web31Addr: "wss://qubit.ge/ws/",
@@ -203,7 +204,9 @@ var state = {
                 return;
             }
             var _this = this;
-            _this.bets.unshift(result);
+            if(_this.compareAddr(_this.metamask.address, result.returnValues.sender))
+                _this.myBets.unshift(result);
+            else _this.bets.unshift(result);
         },
         onJackpot: function(err, result) {
             if (err) {

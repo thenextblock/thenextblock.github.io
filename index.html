@@ -22,6 +22,11 @@
         <nav class="navbar is-transparent is-fixed-top">
             <div class="navbar-brand">
                 <h1 class="navbar-item"><b>TheNextBlock</b></h1>
+                <h1 class="navbar-item">
+                    <a href="https://github.com/thenextblock/thenextblock.github.io">
+                                    <strong><i class="fab fa-github"></i> Github</strong>
+                    </a>
+                </h1>
             </div>
             <div class="navbar-menu">
                 <div class="navbar-start">
@@ -39,16 +44,10 @@
                         <span><b>Total Prize Pool: {{player.pot}} ETH</b></span>
                     </div>
                     <div class="navbar-item">
-                        <span><b>My Points: {{player.points}}</b></span>
-                    </div>
-                    <div class="navbar-item">
                         <span><b>Bet: {{ formatFloat(web31.utils.fromWei(player.allowedBetAmount.toString(), 'ether'))}} ETH</b></span>
                     </div>
                     <div class="navbar-item">
                         <span><b>Total Bets: {{ player.totalBetCount }}</b></span>
-                    </div>
-                    <div class="navbar-item">
-                        <span><b>Required Points: {{player.requiredPoints}}</b></span>
                     </div>
                 </div>
 
@@ -101,15 +100,31 @@
                                 <p>Player can place  1 bet per block. If a player predicts the correct miner, he earns 1 point. The game lasts till someone gets to {{player.requiredPoints}} points, winner gets 70% of prize pool, 20% will be collected  to the next prize pool.</p>
                                 <strong>Game Rules:</strong>
                                 <div style="margin-left: 40px;">
-                                    <ol type="1">
+                                    <ul>
                                         <li>If player doesn’t predict the correct block miner, he will lose all points or if other player wins the prize pool all other players points reduce to 0.</li>
-                                        <li>Players bets are collected to the prize pool plus the 20% from the preview pool.</li>
+                                        <li>Players bets are collected to the prize pool plus the 20% from the previous pool.</li>
                                         <li>Players can skip the blocks without losing points.</li>
-                                    </ol>
+                                    </ul>
                                 </div>
-                                <strong>The total prize are collected from players' bets until one player correctly predicts {{player.requiredPoints}} miners in a row. It is not necessary bet on  each block; it is up to you where to place your bets. </strong>
+                                <div>
+                                    <a target="_blank" v-bind:href="'https://ropsten.etherscan.io/address/' + contract.addr">
+                                        <strong><i class="far fa-file-alt"></i> Smart Contract</strong>
+                                    </a>
+                                </div>
                             </div>
                         </article>
+                    </div>
+                </div>
+                <div class="tile is-parent is-vertical">
+                    <div class="tile is-12 has-text-centered">
+                        <div class="tile is-child">
+                            <h1 class="title">{{player.points}}</h1>
+                            <h2 class="subtitle">Your points.</h2>
+                        </div>
+                        <div class="tile is-child">
+                            <h1 class="title">{{player.requiredPoints}}</h1>
+                            <h2 class="subtitle">Points required to win.</h2>
+                        </div>
                     </div>
                 </div>
                 <div class="tile is-parent is-vertical">
@@ -153,6 +168,21 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr v-bind:class="{ 'isWin': compareAddr(bet.returnValues.betOnMiner, bet.returnValues.miner), 'isLoss' : !compareAddr(bet.returnValues.betOnMiner, bet.returnValues.miner) }" v-for="(bet, index) in myBets">
+                                    <td>
+                                        <span v-if="compareAddr(bet.returnValues.sender, metamask.address)"> <strong>(You)</strong> </span>
+                                        <a target="_blank" v-bind:href="getEtherScanAddressLink(bet.returnValues.sender)">{{shortenStr(bet.returnValues.sender, 10)}}</a>
+                                        <strong>{{ compareAddr(bet.returnValues.betOnMiner, bet.returnValues.miner) ? '(Win)' : '(Loss)' }}</strong>
+                                    </td>
+                                    <td>
+                                        <a target="_blank" v-bind:href="getEtherScanAddressLink(bet.returnValues.betOnMiner)">{{shortenStr(bet.returnValues.betOnMiner, 10)}}</a>
+                                        <span v-show="minerNames[bet.returnValues.betOnMiner.toLowerCase()]" class="tag is-link"><b>{{minerNames[bet.returnValues.betOnMiner.toLowerCase()]}}</b></span>
+                                    </td>
+                                    <td>
+                                        <a target="_blank" v-bind:href="getEtherScanAddressLink(bet.returnValues.miner)">{{shortenStr(bet.returnValues.miner, 10)}}</a>
+                                        <span v-show="minerNames[bet.returnValues.miner.toLowerCase()]" class="tag is-link"><b>{{minerNames[bet.returnValues.miner.toLowerCase()]}}</b></span>
+                                    </td>
+                                </tr>
                                 <tr v-bind:class="{ 'isWin': compareAddr(bet.returnValues.betOnMiner, bet.returnValues.miner), 'isLoss' : !compareAddr(bet.returnValues.betOnMiner, bet.returnValues.miner) }" v-for="(bet, index) in bets">
                                     <td>
                                         <span v-if="compareAddr(bet.returnValues.sender, metamask.address)"> <strong>(You)</strong> </span>
