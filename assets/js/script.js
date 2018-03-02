@@ -248,6 +248,7 @@ var state = {
         }
     },
     created: function() {
+        return;
         var _this = this;
         _this.web31 = new Web31(new Web31.providers.WebsocketProvider(_this.web31Addr));
         if (_this.hasWeb3) {
