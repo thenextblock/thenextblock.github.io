@@ -82,7 +82,7 @@ contract TheNextBlock {
     mapping(address => uint256) public playersPoints;
 
 
-     modifier notContract(address sender)  {
+    modifier notContract(address sender)  {
       uint32 size;
       assembly {
         size := extcodesize(sender)
@@ -149,7 +149,7 @@ contract TheNextBlock {
 
             if(_miner == block.coinbase) {
                 
-                playersPoints[msg.sender] = playersPoints[msg.sender].add(1);
+                playersPoints[msg.sender]++;
 
                 if(playersPoints[msg.sender] == requiredPoints) {
                     
@@ -160,7 +160,6 @@ contract TheNextBlock {
                         nextPrizePool = 0;
                         playersPoints[msg.sender] = 0;
                     } else {
-                        Jackpot(msg.sender, 0);
                         playersPoints[msg.sender]--;
                     }
                 }

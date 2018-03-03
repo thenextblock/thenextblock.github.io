@@ -41,7 +41,7 @@ contract('TheNextBlock', function (accounts) {
         assert.equal((await GameContract.getPlayersPoints(player_1)).toNumber(),  1 );
 
         await GameContract.placeBet(correctMinerAddress, { from: player_1, value: alloweBetAmount  });
-        assert.equal((await GameContract.getPlayersPoints(player_1)).toNumber(),  2 );        
+        assert.equal((await GameContract.getPlayersPoints(player_1)).toNumber(),  2, 'Wrong players points' );        
 
 
         let prizePool =  (await GameContract.getPrizePool()).toNumber();
