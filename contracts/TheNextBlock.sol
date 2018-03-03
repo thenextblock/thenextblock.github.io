@@ -57,18 +57,18 @@ contract TheNextBlock {
     * If bet is less than this amount, transaction is reverted.
     * If moore, contract will send excess amout back to player.
     */
-    uint256 public allowedBetAmount = 5000000000000000; // 0.005 ETH
+    uint256 constant public allowedBetAmount = 5000000000000000; // 0.005 ETH
     /**
     * You need to guess requiredPoints times in a row to win jackpot.
     */
-    uint256 public requiredPoints = 3;
+    uint256 constant public requiredPoints = 3;
     /**
     * Every bet is split: 10% to owner, 70% to prize pool
     * we preserve 20% for next prize pool
     */
-    uint256 public ownerProfitPercent = 10;
-    uint256 public nextPrizePoolPercent = 20;
-    uint256 public prizePoolPercent = 70; 
+    uint256 constant public ownerProfitPercent = 10;
+    uint256 constant public nextPrizePoolPercent = 20;
+    uint256 constant public prizePoolPercent = 70; 
     uint256 public prizePool = 0;
     uint256 public nextPrizePool = 0;
     uint256 public totalBetCount = 0;
@@ -80,6 +80,16 @@ contract TheNextBlock {
     
     mapping(address => Player) public playersStorage;
     mapping(address => uint256) public playersPoints;
+
+
+     modifier notContract(address sender)  {
+      uint32 size;
+      assembly {
+        size := extcodesize(sender)
+      }
+      require (size == 0);
+      _;
+    }
     
     modifier onlyOwner() {
         require(msg.sender == owner.addr);
@@ -125,6 +135,7 @@ contract TheNextBlock {
     function placeBet(address _miner) 
         public
         payable
+        notContract(msg.sender)
         notLess
         notMore
         onlyOnce {
