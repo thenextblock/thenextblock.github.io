@@ -21,7 +21,7 @@ var state = {
         web31Addr: "wss://node1.thenextblock.com/ws/",
         web31Contract: null,
         contract: {
-            addr: "0xcf70f36f8fd04713b33900bab530fd2f63ed9ae0"
+            addr: "0x5ee4c95b0547afbeba683805301eab291ad28f45"
         },
         metamask: {
             address: "",
@@ -248,7 +248,6 @@ var state = {
         }
     },
     created: function() {
-        return;
         var _this = this;
         _this.web31 = new Web31(new Web31.providers.WebsocketProvider(_this.web31Addr));
         if (_this.hasWeb3) {
