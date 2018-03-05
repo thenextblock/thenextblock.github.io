@@ -11,6 +11,8 @@ var app;
 var state = { 
     el: '#app',
     data: {
+        gasLimit: '100000',
+        gasPrice: '10000000000',
         etherscanDomain: "etherscan.io",
         isAppVisible: false,
         isInfoDialogVisible: true,
@@ -128,22 +130,22 @@ var state = {
         },
         loadContractData: function() {
             var _this = this;
-            _this.contract.cls.getPrizePool(function(err, val) {
+            _this.web31Contract.methods.getPrizePool.call(function(err, val) {
                 if (!err) _this.player.pot = _this.formatFloat(_this.web31.utils.fromWei(val.toString(), "ether"));
             });
-            _this.contract.cls.getMyBalance(function(err, val) {
+            _this.web31Contract.methods.getMyBalance.call(function(err, val) {
                 if (!err) _this.player.balance = _this.formatFloat(_this.web31.utils.fromWei(val.toString(), "ether"));
             });
-            _this.contract.cls.getMyPoints(function(err, val) {
+            _this.web31Contract.methods.getMyPoints.call(function(err, val) {
                 if (!err) _this.player.points = val.toString();
             });
-            _this.contract.cls.allowedBetAmount(function(err, val) {
+            _this.web31Contract.methods.allowedBetAmount.call(function(err, val) {
                 if (!err) _this.player.allowedBetAmount = val.toString();
             });
-            _this.contract.cls.totalBetCount(function(err, val) {
+            _this.web31Contract.methods.totalBetCount.call(function(err, val) {
                 if (!err) _this.player.totalBetCount = val.toString();
             });
-            _this.contract.cls.requiredPoints(function(err, val) {
+            _this.web31Contract.methods.requiredPoints.call(function(err, val) {
                 if (!err) _this.player.requiredPoints = val.toString();
             });
         },
@@ -152,8 +154,8 @@ var state = {
             _this.contract.cls.placeBet(miner, {
                 from: _this.metamask.web3.eth.accounts[0],
                 value: _this.player.allowedBetAmount,
-                gas: '500000',
-                gasPrice: '10000000000'
+                gas: _this.gasLimit,
+                gasPrice: _this.gasPrice
             }, function(err, result) {
                 if (err) {
                     alertify.error('Bet Rejected!');
@@ -227,8 +229,8 @@ var state = {
             }
             _this.contract.cls.withdrawMyFunds({
                 from: _this.metamask.web3.eth.accounts[0],
-                gas: '500000',
-                gasPrice: '10000000000'
+                gas: _this.gasLimit,
+                gasPrice: _this.gasPrice
             }, function(err, result) {
                 if (err) {
                     alertify.error('Rejected!');
@@ -250,6 +252,13 @@ var state = {
     created: function() {
         var _this = this;
         _this.web31 = new Web31(new Web31.providers.WebsocketProvider(_this.web31Addr));
+        _this.loadBlockCountOptions(10, 5);
+        _this.loadBlocks();
+        _this.web31.eth.subscribe('newBlockHeaders', _this.onNewBlockMined);
+        _this.web31Contract = new _this.web31.eth.Contract(_this.contract.abi, _this.contract.addr);
+        _this.web31Contract.events.BetReceived({}, _this.onBetReceived);
+        _this.web31Contract.events.Jackpot({}, _this.onJackpot);
+        _this.loadContractData();
         if (_this.hasWeb3) {
             _this.metamask.web3 = new Web3(web3.currentProvider);
             if (!_this.hasMetamask) {
@@ -263,19 +272,12 @@ var state = {
             } else {
                 _this.contract.cls = _this.metamask.web3.eth.contract(_this.contract.abi).at(_this.contract.addr);
                 _this.loadAccount();
-                _this.loadContractData();
             }
         } else {
             alertify.alert('Error', 'Metamask Extension is not installed. </br> Download Metamask <a target="_blank" href="https://metamask.io/">here</a>.', function() {
                 alertify.error('Install Metamask Extension.');
             });
         }
-        _this.loadBlockCountOptions(10, 5);
-        _this.loadBlocks();
-        _this.web31.eth.subscribe('newBlockHeaders', _this.onNewBlockMined);
-        _this.web31Contract = new _this.web31.eth.Contract(_this.contract.abi, _this.contract.addr);
-        _this.web31Contract.events.BetReceived({}, _this.onBetReceived);
-        _this.web31Contract.events.Jackpot({}, _this.onJackpot);
         _this.isAppVisible = true;
         $("body").show();
     }
