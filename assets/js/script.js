@@ -130,22 +130,22 @@ var state = {
         },
         loadContractData: function() {
             var _this = this;
-            _this.web31Contract.methods.getPrizePool.call(function(err, val) {
+            _this.web31Contract.methods.getPrizePool.call().call(function(err, val) {
                 if (!err) _this.player.pot = _this.formatFloat(_this.web31.utils.fromWei(val.toString(), "ether"));
             });
-            _this.web31Contract.methods.getMyBalance.call(function(err, val) {
+            _this.web31Contract.methods.getMyBalance.call().call(function(err, val) {
                 if (!err) _this.player.balance = _this.formatFloat(_this.web31.utils.fromWei(val.toString(), "ether"));
             });
-            _this.web31Contract.methods.getMyPoints.call(function(err, val) {
+            _this.web31Contract.methods.getMyPoints.call().call(function(err, val) {
                 if (!err) _this.player.points = val.toString();
             });
-            _this.web31Contract.methods.allowedBetAmount.call(function(err, val) {
+            _this.web31Contract.methods.allowedBetAmount.call().call(function(err, val) {
                 if (!err) _this.player.allowedBetAmount = val.toString();
             });
-            _this.web31Contract.methods.totalBetCount.call(function(err, val) {
+            _this.web31Contract.methods.totalBetCount.call().call(function(err, val) {
                 if (!err) _this.player.totalBetCount = val.toString();
             });
-            _this.web31Contract.methods.requiredPoints.call(function(err, val) {
+            _this.web31Contract.methods.requiredPoints.call().call(function(err, val) {
                 if (!err) _this.player.requiredPoints = val.toString();
             });
         },
