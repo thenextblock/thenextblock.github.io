@@ -20,7 +20,7 @@ var state = {
         bets: [],
         myBets: [],
         web31: null,
-        web31Addr: "wss://mainnet.infura.io/WIBVWLVEl1CmowJkZ55q", //"wss://node1.thenextblock.com/ws/",
+        web31Addr: "wss://mainnet.infura.io/ws/WIBVWLVEl1CmowJkZ55q", //"wss://node1.thenextblock.com/ws/",
         web31Contract: null,
         contract: {
             addr: "0x5ee4c95b0547afbeba683805301eab291ad28f45"
